@@ -249,8 +249,6 @@ app.delete('/meals/:id', function(req, res) {
   const userId = "123";
   const {id} = req.params;
 
-  const newAnimal = req.body;
-
   sql.query("DELETE FROM pasto WHERE _id = ?", id, (err, result) => {
     if (err) {
       console.log("error: ", err);
