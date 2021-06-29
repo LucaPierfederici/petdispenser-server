@@ -73,8 +73,14 @@ app.get('/animals/:id', function(req, res) {
       return;
     }
 
-    console.log("users: ", result);
-    res.json({success: true, result});
+    if (!result.length) {
+      console.log("error: ", err);
+      res.json({success: false, error: "Animal not found"});
+      return;
+    }
+
+    console.log("animalID: ", result);
+    res.json({success: true, result: result[0]});
     return;
   });
 });
@@ -85,6 +91,7 @@ app.post('/animals', function(req, res) {
   const {id} = req.params;
 
   const newAnimal = req.body;
+  console.log("newAnimal: ", newAnimal);
 
   sql.query("INSERT INTO animale SET ?", newAnimal, (err, result) => {
     if (err) {
@@ -106,7 +113,7 @@ app.put('/animals/:id', function(req, res) {
 
   const newAnimal = req.body;
 
-  sql.query("UPDATE users SET nome_animale = ?, path = ?, tipologia = ?, razza = ?, peso = ?, ddn = ? WHERE id = ?", [
+  sql.query("UPDATE animale SET nome_animale = ?, path = ?, tipologia = ?, razza = ?, peso = ?, ddn = ? WHERE _id = ?", [
     newAnimal.nome_animale, newAnimal.path, newAnimal.tipologia, newAnimal.razza, newAnimal.peso, newAnimal.ddn, id
   ], (err, result) => {
     if (err) {
@@ -128,9 +135,7 @@ app.delete('/animals/:id', function(req, res) {
 
   const newAnimal = req.body;
 
-  sql.query("UPDATE users SET nome_animale = ?, path = ?, tipologia = ?, razza = ?, peso = ?, ddn = ? WHERE id = ?", [
-    newAnimal.nome_animale, newAnimal.path, newAnimal.tipologia, newAnimal.razza, newAnimal.peso, newAnimal.ddn, id
-  ], (err, result) => {
+  sql.query("DELETE FROM animale WHERE _id = ?", id, (err, result) => {
     if (err) {
       console.log("error: ", err);
       res.json({success: false, error: err});
@@ -138,6 +143,122 @@ app.delete('/animals/:id', function(req, res) {
     }
 
     console.log("animal: ", result);
+    res.json({success: true, result});
+    return;
+  });
+});
+
+app.get('/meals', function(req, res) {
+  // check if token is valid
+  const userId = "uje3LNinlBQRKKnT55Do95tDdPp1";
+  const filters = [];
+
+  Object.keys(req.query).forEach((key) => {
+    switch (key) {
+      case 'date':
+        if(req.query[key])
+          filters.push(`AND data = '${req.query[key]}'`);
+        break;
+      default:
+        break;
+    }
+  });
+  const q = `SELECT * from pasto WHERE id_google_utente='${userId}' ${filters.join(" ")} order by ora ASC`;
+  console.log("QUERY",q);
+  sql.query(q, (err, result) => {
+    if (err) {
+      console.log("error: ", err);
+      res.json({success: false, error: err});
+      return;
+    }
+
+    console.log("meals: ", result);
+    res.json({success: true, result});
+    return;
+  });
+});
+
+app.get('/meals/:id', function(req, res) {
+  // check if token is valid
+  const userId = "123";
+  const {id} = req.params;
+  sql.query(`SELECT * from pasto where _id='${id}' LIMIT 1`, (err, result) => {
+    if (err) {
+      console.log("error: ", err);
+      res.json({success: false, error: err})
+      return;
+    }
+
+    if (!result.length) {
+      console.log("error: ", err);
+      res.json({success: false, error: "Meal not found"});
+      return;
+    }
+
+    console.log("mealID: ", result);
+    res.json({success: true, result: result[0]});
+    return;
+  });
+});
+
+app.post('/meals', function(req, res) {
+  // check if token is valid
+  const userId = "123";
+  const {id} = req.params;
+
+  const newMeal = req.body;
+  console.log("newMeal: ", newMeal);
+
+  sql.query("INSERT INTO pasto SET ?", newMeal, (err, result) => {
+    if (err) {
+      console.log("error: ", err);
+      res.json({success: false, error: err});
+      return;
+    }
+
+    console.log("meal: ", result);
+    res.json({success: true, result});
+    return;
+  });
+});
+
+app.put('/meals/:id', function(req, res) {
+  // check if token is valid
+  const userId = "123";
+  const {id} = req.params;
+
+  const newMeal = req.body;
+
+  sql.query("UPDATE pasto SET nome = ?, quantita_croccantini = ?, quantita_umido = ?, note = ?, pasto_dieta_id = ?, data = ?, ora = ? WHERE _id = ?", [
+    newMeal.nome, newMeal.quantita_croccantini, newMeal.quantita_umido, newMeal.note, newMeal.pasto_dieta_id, newMeal.data, newMeal.ora, id
+  ], (err, result) => {
+    if (err) {
+      console.log("error: ", err);
+      res.json({success: false, error: err});
+      return;
+    }
+
+    console.log("meal: ", result);
+    res.json({success: true, result});
+    return;
+  });
+});
+
+app.delete('/meals/:id', function(req, res) {
+  // check if token is valid
+  const userId = "123";
+  const {id} = req.params;
+
+  const newAnimal = req.body;
+
+  sql.query("DELETE FROM pasto WHERE _id = ?", id, (err, result) => {
+    if (err) {
+      console.log("error: ", err);
+      res.json({success: false, error: err});
+      return;
+    }
+
+    console.log("meal: ", result);
     res.json({success: true, result});
     return;
   });
