@@ -48,7 +48,7 @@ app.get('/checktoken', function(req, res) {
 
 app.get('/animals', function(req, res) {
   // check if token is valid
-  const userId = "123";
+  const userId = "uje3LNinlBQRKKnT55Do95tDdPp1";
   sql.query(`SELECT * from animale where id_google_utente='${userId}'`, (err, result) => {
     if (err) {
       console.log("error: ", err);
@@ -66,7 +66,7 @@ app.get('/animals/:id', function(req, res) {
   // check if token is valid
   const userId = "123";
   const {id} = req.params;
-  sql.query(`SELECT * from animale where _id='${id} LIMIT 1'`, (err, result) => {
+  sql.query(`SELECT * from animale where _id='${id}' LIMIT 1`, (err, result) => {
     if (err) {
       console.log("error: ", err);
       res.json({success: false, error: err})
