@@ -1,0 +1,34 @@
+TODO:
+- Connessione DB
+- Creazione endpoint
+- Collegamento con API pubblica
+- Adattamento codice Java
+
+
+ENDPOINTS:
+
+GET /animals/[con filtri da revisionare]
+GET /animals/:id
+POST /animals/
+PUT /animals/:id
+DELETE /animals/:id
+
+GET /meal/[con filtri da revisionare]
+GET /meal/:id
+POST /meal/
+PUT /meal/:id
+DELETE /meal/:id
+
+GET /diets/[con filtri da revisionare]
+GET /diets/:id
+POST /diets/
+PUT /diets/:id
+DELETE /diets/:id
+GET /diets/:id/meal
+
+GET /dispenser/[con filtri da revisionare]
+GET /dispenser/:id
+POST /dispenser/
+PUT /dispenser/:id
+DELETE /dispenser/:id
+GET /dispenser/:id/diet
