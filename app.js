@@ -7,7 +7,6 @@ See the License for the specific language governing permissions and limitations 
 */
 
 
-
 var express = require('express')
 var bodyParser = require('body-parser')
 var awsServerlessExpressMiddleware = require('aws-serverless-express/middleware')
@@ -257,6 +256,245 @@ app.delete('/meals/:id', function(req, res) {
     }
 
     console.log("meal: ", result);
+    res.json({success: true, result});
+    return;
+  });
+});
+
+// *** DIET ******
+
+app.get('/diets', function(req, res) {
+  // check if token is valid
+  const userId = "uje3LNinlBQRKKnT55Do95tDdPp1";
+  sql.query(`SELECT * from dieta where id_google_utente='${userId}'`, (err, result) => {
+    if (err) {
+      console.log("error: ", err);
+      res.json({success: false, error: err});
+      return;
+    }
+
+    console.log("diets: ", result);
+    res.json({success: true, result});
+    return;
+  });
+});
+
+app.get('/diets/:id', function(req, res) {
+  // check if token is valid
+  const userId = "123";
+  const {id} = req.params;
+  sql.query(`SELECT * from dieta where _id='${id} LIMIT 1'`, (err, result) => {
+    if (err) {
+      console.log("error: ", err);
+      res.json({success: false, error: err})
+      return;
+    }
+
+    if (!result.length) {
+      console.log("error: ", err);
+      res.json({success: false, error: "Diet not found"});
+      return;
+    }
+
+    console.log("dietID: ", result);
+    res.json({success: true, result: result[0]});
+
+    return;
+  });
+});
+
+app.post('/diets', function(req, res) {
+  // check if token is valid
+  const userId = "123";
+  const {id} = req.params;
+
+  const newDiet = req.body;
+
+  sql.query("INSERT INTO dieta SET ?", newDiet, (err, result) => {
+    if (err) {
+      console.log("error: ", err);
+      res.json({success: false, error: err});
+      return;
+    }
+
+    console.log("dietPost: ", result);
+    res.json({success: true, result});
+    return;
+  });
+});
+
+app.put('/diets/:id', function(req, res) {
+  // check if token is valid
+  const userId = "123";
+  const {id} = req.params;
+
+  const newDiet = req.body;
+
+  sql.query("UPDATE dieta SET nome_dieta = ?, note = ?, dieta_attiva = ?, dieta_animale_id = ?, dieta_dispenser_id = ? WHERE _id = ?", [
+    newDiet.nome_dieta, newDiet.note, newDiet.dieta_attiva, newDiet.dieta_animale_id, newDiet.dieta_dispenser_id, id
+  ], (err, result) => {
+    if (err) {
+      console.log("error: ", err);
+      res.json({success: false, error: err});
+      return;
+    }
+
+    console.log("dietPut: ", result);
+    res.json({success: true, result});
+    return;
+  });
+});
+
+app.delete('/diets/:id', function(req, res) {
+  const userId = "123";
+  const {id} = req.params;
+
+  const newAnimal = req.body;
+
+  sql.query("DELETE FROM dieta WHERE _id = ?", id, (err, result) => {
+    if (err) {
+      console.log("error: ", err);
+      res.json({success: false, error: err});
+      return;
+    }
+
+    console.log("meal: ", result);
+    res.json({success: true, result});
+    return;
+  });
+});
+
+app.get('/diets/:id/meal', function(req, res) {
+  // check if token is valid
+  const userId = "123";
+  const {id} = req.params;
+  sql.query(`select * from pasto where pasto_dieta_id='${id}'`, (err, result) => {
+    if (err) {
+      console.log("error: ", err);
+      res.json({success: false, error: err})
+      return;
+    }
+
+    console.log("users: ", result);
+    res.json({success: true, result});
+    return;
+  });
+});
+
+//++++++++++++ DISPENSER +++++++++++++++
+
+app.get('/dispenser', function(req, res) {
+  // check if token is valid
+  const userId = "uje3LNinlBQRKKnT55Do95tDdPp1";
+  sql.query(`SELECT * from dispenser where id_google_utente='${userId}'`, (err, result) => {
+    if (err) {
+      console.log("error: ", err);
+      res.json({success: false, error: err});
+      return;
+    }
+
+    console.log("dispensers: ", result);
+    res.json({success: true, result});
+    return;
+  });
+});
+
+app.get('/dispenser/:id', function(req, res) {
+  // check if token is valid
+  const userId = "123";
+  const {id} = req.params;
+  sql.query(`SELECT * from dispenser where _id='${id} LIMIT 1'`, (err, result) => {
+    if (err) {
+      console.log("error: ", err);
+      res.json({success: false, error: err})
+      return;
+    }
+
+    if (!result.length) {
+      console.log("error: ", err);
+      res.json({success: false, error: "Dispenser not found"});
+      return;
+    }
+
+    console.log("dispenserID: ", result);
+    res.json({success: true, result: result[0]});
+    return;
+  });
+});
+
+app.post('/dispenser', function(req, res) {
+  // check if token is valid
+  const userId = "123";
+  const {id} = req.params;
+
+  const newDispenser = req.body;
+
+  sql.query("INSERT INTO dispenser SET ?", newDispenser, (err, result) => {
+    if (err) {
+      console.log("error: ", err);
+      res.json({success: false, error: err});
+      return;
+    }
+
+    console.log("dispenser: ", result);
+    res.json({success: true, result});
+    return;
+  });
+});
+
+app.put('/dispenser/:id', function(req, res) {
+  // check if token is valid
+  const userId = "123";
+  const {id} = req.params;
+
+  const newDispenser = req.body;
+
+  sql.query("UPDATE dispenser SET nome = ?, codice_bluetooth = ? WHERE _id = ?", [
+    newDispenser.nome, newDispenser.codice_bluetooth, id
+  ], (err, result) => {
+    if (err) {
+      console.log("error: ", err);
+      res.json({success: false, error: err});
+      return;
+    }
+
+    console.log("diet: ", result);
+    res.json({success: true, result});
+    return;
+  });
+});
+
+app.delete('/dispenser/:id', function(req, res) {
+  const userId = "123";
+  const {id} = req.params;
+
+  const newAnimal = req.body;
+
+  sql.query("DELETE FROM dispenser WHERE _id = ?", id, (err, result) => {
+    if (err) {
+      console.log("error: ", err);
+      res.json({success: false, error: err});
+      return;
+    }
+
+    console.log("dispenser: ", result);
+    res.json({success: true, result});
+    return;
+  });
+});
+
+app.get('/dispenser/:id/diet', function(req, res) {
+  // check if token is valid
+  const userId = "123";
+  const {id} = req.params;
+  sql.query(`select * from dieta where dieta_dispenser_id='${id} LIMIT 1'`, (err, result) => {
+    if (err) {
+      console.log("error: ", err);
+      res.json({success: false, error: err})
+      return;
+    }
+
+    console.log("users: ", result);
     res.json({success: true, result});
     return;
   });
