@@ -29,6 +29,25 @@ app.use(function(req, res, next) {
  * Example get method *
  **********************/
 
+function verifyTokenCorrectness(idToken)
+{
+    // idToken comes from the client app
+    admin
+        .auth()
+        .verifyIdToken(idToken)
+        .then((decodedToken) => {
+            const uid = decodedToken.uid;
+            return {
+                uid, succes: true
+            };
+        })
+        .catch((error) => {
+            return {
+                error, succes: false
+            };
+        });
+}
+
 app.get('/checktoken', function(req, res) {
   // Add your code here
   sql.query("SELECT * from dieta", (err, result) => {
