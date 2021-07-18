@@ -66,11 +66,14 @@ app.get('/animals', async function (req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
-  const tokenDecoded = await verifyTokenCorrectness(token);
-  if (!tokenDecoded.success) {
-      res.json(tokenDecoded);
+  let tokenDecoded;
+  try {
+    tokenDecoded = await verifyTokenCorrectness(token);
+  } catch(err) {
+      res.json(err);
       return;
   }
+  
   const userId = tokenDecoded.uid;
   const filters = [];
 
@@ -102,11 +105,14 @@ app.get('/animals/:id', async function(req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
-  const tokenDecoded = await verifyTokenCorrectness(token);
-  if (!tokenDecoded.success) {
-      res.json(tokenDecoded);
+  let tokenDecoded;
+  try {
+    tokenDecoded = await verifyTokenCorrectness(token);
+  } catch(err) {
+      res.json(err);
       return;
   }
+  
   const userId = tokenDecoded.uid;
   const {id} = req.params;
     sql.query(`SELECT * from animale where _id='${id}' and id_google_utente='${userId}' LIMIT 1`, (err, result) => {
@@ -132,10 +138,11 @@ app.post('/animals', async function(req, res) {
     const token = req.headers.authorization;
     if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
-    const tokenDecoded = await verifyTokenCorrectness(token);
-    if (!tokenDecoded.success) {
-        res.json(tokenDecoded);
-        return;
+    let tokenDecoded;
+    try {
+      tokenDecoded = await verifyTokenCorrectness(token);
+    } catch(err) {
+      res.json(err);
     }
     const userId = tokenDecoded.uid;
   const {id} = req.params;
@@ -160,11 +167,14 @@ app.put('/animals/:id', async function(req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
-  const tokenDecoded = await verifyTokenCorrectness(token);
-  if (!tokenDecoded.success) {
-      res.json(tokenDecoded);
+  let tokenDecoded;
+  try {
+    tokenDecoded = await verifyTokenCorrectness(token);
+  } catch(err) {
+      res.json(err);
       return;
   }
+  
   const userId = tokenDecoded.uid;
   const {id} = req.params;
 
@@ -189,11 +199,14 @@ app.delete('/animals/:id', async function(req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
-  const tokenDecoded = await verifyTokenCorrectness(token);
-  if (!tokenDecoded.success) {
-      res.json(tokenDecoded);
+  let tokenDecoded;
+  try {
+    tokenDecoded = await verifyTokenCorrectness(token);
+  } catch(err) {
+      res.json(err);
       return;
   }
+  
   const userId = tokenDecoded.uid;
   const {id} = req.params;
 
@@ -216,11 +229,14 @@ app.get('/animals/:id/diets', async function(req, res) {
  const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
-  const tokenDecoded = await verifyTokenCorrectness(token);
-  if (!tokenDecoded.success) {
-      res.json(tokenDecoded);
+  let tokenDecoded;
+  try {
+    tokenDecoded = await verifyTokenCorrectness(token);
+  } catch(err) {
+      res.json(err);
       return;
   }
+  
   const userId = tokenDecoded.uid;
   const {id} = req.params;
 
@@ -241,11 +257,14 @@ app.get('/meals', async function(req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
-  const tokenDecoded = await verifyTokenCorrectness(token);
-  if (!tokenDecoded.success) {
-      res.json(tokenDecoded);
+  let tokenDecoded;
+  try {
+    tokenDecoded = await verifyTokenCorrectness(token);
+  } catch(err) {
+      res.json(err);
       return;
   }
+  
   const userId = tokenDecoded.uid;
   const filters = [];
 
@@ -278,11 +297,14 @@ app.get('/meals/:id', async function(req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
-  const tokenDecoded = await verifyTokenCorrectness(token);
-  if (!tokenDecoded.success) {
-      res.json(tokenDecoded);
+  let tokenDecoded;
+  try {
+    tokenDecoded = await verifyTokenCorrectness(token);
+  } catch(err) {
+      res.json(err);
       return;
   }
+  
   const userId = tokenDecoded.uid;
   const {id} = req.params;
     sql.query(`SELECT * from pasto where _id='${id}' and id_google_utente='${userId}' LIMIT 1`, (err, result) => {
@@ -308,11 +330,14 @@ app.post('/meals', async function(req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
-  const tokenDecoded = await verifyTokenCorrectness(token);
-  if (!tokenDecoded.success) {
-      res.json(tokenDecoded);
+  let tokenDecoded;
+  try {
+    tokenDecoded = await verifyTokenCorrectness(token);
+  } catch(err) {
+      res.json(err);
       return;
   }
+  
   const userId = tokenDecoded.uid;
   const {id} = req.params;
 
@@ -336,11 +361,14 @@ app.put('/meals/:id',async function(req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
-  const tokenDecoded = await verifyTokenCorrectness(token);
-  if (!tokenDecoded.success) {
-      res.json(tokenDecoded);
+  let tokenDecoded;
+  try {
+    tokenDecoded = await verifyTokenCorrectness(token);
+  } catch(err) {
+      res.json(err);
       return;
   }
+  
   const userId = tokenDecoded.uid;
   const {id} = req.params;
 
@@ -365,11 +393,14 @@ app.delete('/meals/:id', async function(req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
-  const tokenDecoded = await verifyTokenCorrectness(token);
-  if (!tokenDecoded.success) {
-      res.json(tokenDecoded);
+  let tokenDecoded;
+  try {
+    tokenDecoded = await verifyTokenCorrectness(token);
+  } catch(err) {
+      res.json(err);
       return;
   }
+  
   const userId = tokenDecoded.uid;
   const {id} = req.params;
 
@@ -392,11 +423,14 @@ app.get('/diets', async function(req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
-  const tokenDecoded = await verifyTokenCorrectness(token);
-  if (!tokenDecoded.success) {
-      res.json(tokenDecoded);
+  let tokenDecoded;
+  try {
+    tokenDecoded = await verifyTokenCorrectness(token);
+  } catch(err) {
+      res.json(err);
       return;
   }
+  
   const userId = tokenDecoded.uid;
   sql.query(`SELECT * from dieta where id_google_utente='${userId}'`, (err, result) => {
     if (err) {
@@ -415,11 +449,14 @@ app.get('/diets/:id', async function(req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
-  const tokenDecoded = await verifyTokenCorrectness(token);
-  if (!tokenDecoded.success) {
-      res.json(tokenDecoded);
+  let tokenDecoded;
+  try {
+    tokenDecoded = await verifyTokenCorrectness(token);
+  } catch(err) {
+      res.json(err);
       return;
   }
+  
   const userId = tokenDecoded.uid;
   const {id} = req.params;
     sql.query(`SELECT * from dieta where _id='${id}' and id_google_utente='${userId}' LIMIT 1`, (err, result) => {
@@ -446,11 +483,14 @@ app.get('/diets/last', async function(req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
-  const tokenDecoded = await verifyTokenCorrectness(token);
-  if (!tokenDecoded.success) {
-      res.json(tokenDecoded);
+  let tokenDecoded;
+  try {
+    tokenDecoded = await verifyTokenCorrectness(token);
+  } catch(err) {
+      res.json(err);
       return;
   }
+  
   const userId = tokenDecoded.uid;
   sql.query(`SELECT * from dieta where id_google_utente='${userId}' ORDER BY _id DESC LIMIT 1`, (err, result) => {
     if (err) {
@@ -476,11 +516,14 @@ app.post('/diets', async function(req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
-  const tokenDecoded = await verifyTokenCorrectness(token);
-  if (!tokenDecoded.success) {
-      res.json(tokenDecoded);
+  let tokenDecoded;
+  try {
+    tokenDecoded = await verifyTokenCorrectness(token);
+  } catch(err) {
+      res.json(err);
       return;
   }
+  
   const userId = tokenDecoded.uid;
   const {id} = req.params;
 
@@ -503,11 +546,14 @@ app.put('/diets/:id', async function(req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
-  const tokenDecoded = await verifyTokenCorrectness(token);
-  if (!tokenDecoded.success) {
-      res.json(tokenDecoded);
+  let tokenDecoded;
+  try {
+    tokenDecoded = await verifyTokenCorrectness(token);
+  } catch(err) {
+      res.json(err);
       return;
   }
+  
   const userId = tokenDecoded.uid;
   const {id} = req.params;
 
@@ -532,11 +578,14 @@ app.delete('/diets/:id', async function(req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
-  const tokenDecoded = await verifyTokenCorrectness(token);
-  if (!tokenDecoded.success) {
-      res.json(tokenDecoded);
+  let tokenDecoded;
+  try {
+    tokenDecoded = await verifyTokenCorrectness(token);
+  } catch(err) {
+      res.json(err);
       return;
   }
+  
   const userId = tokenDecoded.uid;
   const {id} = req.params;
 
@@ -559,11 +608,14 @@ app.get('/diets/:id/meal', async function(req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
-  const tokenDecoded = await verifyTokenCorrectness(token);
-  if (!tokenDecoded.success) {
-      res.json(tokenDecoded);
+  let tokenDecoded;
+  try {
+    tokenDecoded = await verifyTokenCorrectness(token);
+  } catch(err) {
+      res.json(err);
       return;
   }
+  
   const userId = tokenDecoded.uid;
   const {id} = req.params;
     sql.query(`select * from pasto where pasto_dieta_id='${id}' and id_google_utente='${userId}'`, (err, result) => {
@@ -585,11 +637,14 @@ app.get('/dispenser', async function(req, res) {
  const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
-  const tokenDecoded = await verifyTokenCorrectness(token);
-  if (!tokenDecoded.success) {
-      res.json(tokenDecoded);
+  let tokenDecoded;
+  try {
+    tokenDecoded = await verifyTokenCorrectness(token);
+  } catch(err) {
+      res.json(err);
       return;
   }
+  
   const userId = tokenDecoded.uid;
   const filters = [];
 
@@ -622,11 +677,14 @@ app.get('/dispenser/:id', async function(req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
-  const tokenDecoded = await verifyTokenCorrectness(token);
-  if (!tokenDecoded.success) {
-      res.json(tokenDecoded);
+  let tokenDecoded;
+  try {
+    tokenDecoded = await verifyTokenCorrectness(token);
+  } catch(err) {
+      res.json(err);
       return;
   }
+  
   const userId = tokenDecoded.uid;
   const {id} = req.params;
     sql.query(`SELECT * from dispenser where _id='${id}' and id_google_utente='${userId}'`, (err, result) => {
@@ -666,11 +724,14 @@ app.put('/dispenser/:id', async function(req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
-  const tokenDecoded = await verifyTokenCorrectness(token);
-  if (!tokenDecoded.success) {
-      res.json(tokenDecoded);
+  let tokenDecoded;
+  try {
+    tokenDecoded = await verifyTokenCorrectness(token);
+  } catch(err) {
+      res.json(err);
       return;
   }
+  
   const userId = tokenDecoded.uid;
   const {id} = req.params;
 
@@ -695,11 +756,14 @@ app.delete('/dispenser/:id', async function(req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
-  const tokenDecoded = await verifyTokenCorrectness(token);
-  if (!tokenDecoded.success) {
-      res.json(tokenDecoded);
+  let tokenDecoded;
+  try {
+    tokenDecoded = await verifyTokenCorrectness(token);
+  } catch(err) {
+      res.json(err);
       return;
   }
+  
   const userId = tokenDecoded.uid;
   const {id} = req.params;
 
@@ -722,11 +786,14 @@ app.get('/dispenser/:id/diet', async function(req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
-  const tokenDecoded = await verifyTokenCorrectness(token);
-  if (!tokenDecoded.success) {
-      res.json(tokenDecoded);
+  let tokenDecoded;
+  try {
+    tokenDecoded = await verifyTokenCorrectness(token);
+  } catch(err) {
+      res.json(err);
       return;
   }
+  
   const userId = tokenDecoded.uid;
   const {id} = req.params;
     sql.query(`select * from dieta where dieta_dispenser_id='${id}' and id_google_utente='${userId}' LIMIT 1`, (err, result) => {
