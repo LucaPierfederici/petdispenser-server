@@ -29,8 +29,7 @@ app.use(function(req, res, next) {
  * Example get method *
  **********************/
 
-function verifyTokenCorrectness(idToken)
-{
+function verifyTokenCorrectness(idToken) {
     // idToken comes from the client app
     admin
         .auth()
@@ -49,19 +48,13 @@ function verifyTokenCorrectness(idToken)
 }
 
 app.get('/checktoken', function(req, res) {
-  // Add your code here
-  sql.query("SELECT * from dieta", (err, result) => {
-    if (err) {
-      console.log("error: ", err);
-      res.json({success: false, error: err});
-      return;
-    }
+    // Add your code here
+    const token = req.headers.authorization;
+    if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
-    console.log("users: ", result);
-    res.json({success: true, result});
-    return;
-  });
-  //res.json({success: 'get call succeed!', url: req.url});
+    const oi = verifyTokenCorrectness(token);
+    res.json(oi);
+
 });
 
 app.get('/animals', function(req, res) {
