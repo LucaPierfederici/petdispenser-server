@@ -42,12 +42,12 @@ async function verifyTokenCorrectness(idToken) {
         .then((decodedToken) => {
             const uid = decodedToken.uid;
             return {
-                uid, succes: true
+                uid, success: true
             };
         })
         .catch((error) => {
             return {
-                error, succes: false
+                error, success: false
             };
         });
 }
