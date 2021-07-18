@@ -62,9 +62,16 @@ app.get('/checktoken', async function(req, res) {
 
 });
 
-app.get('/animals', function(req, res) {
-  // check if token is valid
-  const userId = "uje3LNinlBQRKKnT55Do95tDdPp1";
+app.get('/animals', function (req, res) {
+  const token = req.headers.authorization;
+  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+
+  const tokenDecoded = await verifyTokenCorrectness(token);
+  if (!tokenDecoded.success) {
+      res.json(tokenDecoded);
+      return;
+  }
+  const userId = tokenDecoded.uid;
   const filters = [];
 
   Object.keys(req.query).forEach((key) => {
@@ -92,10 +99,17 @@ app.get('/animals', function(req, res) {
 });
 
 app.get('/animals/:id', function(req, res) {
-  // check if token is valid
-  const userId = "uje3LNinlBQRKKnT55Do95tDdPp1";
+  const token = req.headers.authorization;
+  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+
+  const tokenDecoded = await verifyTokenCorrectness(token);
+  if (!tokenDecoded.success) {
+      res.json(tokenDecoded);
+      return;
+  }
+  const userId = tokenDecoded.uid;
   const {id} = req.params;
-  sql.query(`SELECT * from animale where _id='${id}' LIMIT 1`, (err, result) => {
+    sql.query(`SELECT * from animale where _id='${id} and id_google_utente='${userId}' LIMIT 1`, (err, result) => {
     if (err) {
       console.log("error: ", err);
       res.json({success: false, error: err})
@@ -115,8 +129,15 @@ app.get('/animals/:id', function(req, res) {
 });
 
 app.post('/animals', function(req, res) {
-  // check if token is valid
-  const userId = "uje3LNinlBQRKKnT55Do95tDdPp1";
+    const token = req.headers.authorization;
+    if (!token) res.json({ success: false, error: 'tokenNotFound' });
+
+    const tokenDecoded = await verifyTokenCorrectness(token);
+    if (!tokenDecoded.success) {
+        res.json(tokenDecoded);
+        return;
+    }
+    const userId = tokenDecoded.uid;
   const {id} = req.params;
 
   const newAnimal = req.body;
@@ -136,14 +157,21 @@ app.post('/animals', function(req, res) {
 });
 
 app.put('/animals/:id', function(req, res) {
-  // check if token is valid
-  const userId = "uje3LNinlBQRKKnT55Do95tDdPp1";
+  const token = req.headers.authorization;
+  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+
+  const tokenDecoded = await verifyTokenCorrectness(token);
+  if (!tokenDecoded.success) {
+      res.json(tokenDecoded);
+      return;
+  }
+  const userId = tokenDecoded.uid;
   const {id} = req.params;
 
   const newAnimal = req.body;
 
-  sql.query("UPDATE animale SET nome_animale = ?, path = ?, tipologia = ?, razza = ?, peso = ?, ddn = ? WHERE _id = ?", [
-    newAnimal.nome_animale, newAnimal.path, newAnimal.tipologia, newAnimal.razza, newAnimal.peso, newAnimal.ddn, id
+    sql.query("UPDATE animale SET nome_animale = ?, path = ?, tipologia = ?, razza = ?, peso = ?, ddn = ? WHERE _id = ? and id_google_utente= ?", [
+        newAnimal.nome_animale, newAnimal.path, newAnimal.tipologia, newAnimal.razza, newAnimal.peso, newAnimal.ddn, id, userId
   ], (err, result) => {
     if (err) {
       console.log("error: ", err);
@@ -158,13 +186,20 @@ app.put('/animals/:id', function(req, res) {
 });
 
 app.delete('/animals/:id', function(req, res) {
-  // check if token is valid
-  const userId = "uje3LNinlBQRKKnT55Do95tDdPp1";
+  const token = req.headers.authorization;
+  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+
+  const tokenDecoded = await verifyTokenCorrectness(token);
+  if (!tokenDecoded.success) {
+      res.json(tokenDecoded);
+      return;
+  }
+  const userId = tokenDecoded.uid;
   const {id} = req.params;
 
   const newAnimal = req.body;
 
-  sql.query("DELETE FROM animale WHERE _id = ?", id, (err, result) => {
+    sql.query("DELETE FROM animale WHERE _id = ? and id_google_utente= ?", [id, userId], (err, result) => {
     if (err) {
       console.log("error: ", err);
       res.json({success: false, error: err});
@@ -178,8 +213,15 @@ app.delete('/animals/:id', function(req, res) {
 });
 
 app.get('/animals/:id/diets', function(req, res) {
-  // check if token is valid
-  const userId = "uje3LNinlBQRKKnT55Do95tDdPp1";
+ const token = req.headers.authorization;
+  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+
+  const tokenDecoded = await verifyTokenCorrectness(token);
+  if (!tokenDecoded.success) {
+      res.json(tokenDecoded);
+      return;
+  }
+  const userId = tokenDecoded.uid;
   const {id} = req.params;
 
   sql.query(`SELECT * from dieta where dieta_animale_id='${id}' AND id_google_utente='${userId}'`, (err, result) => {
@@ -196,8 +238,15 @@ app.get('/animals/:id/diets', function(req, res) {
 });
 
 app.get('/meals', function(req, res) {
-  // check if token is valid
-  const userId = "uje3LNinlBQRKKnT55Do95tDdPp1";
+  const token = req.headers.authorization;
+  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+
+  const tokenDecoded = await verifyTokenCorrectness(token);
+  if (!tokenDecoded.success) {
+      res.json(tokenDecoded);
+      return;
+  }
+  const userId = tokenDecoded.uid;
   const filters = [];
 
   Object.keys(req.query).forEach((key) => {
@@ -226,10 +275,17 @@ app.get('/meals', function(req, res) {
 });
 
 app.get('/meals/:id', function(req, res) {
-  // check if token is valid
-  const userId = "uje3LNinlBQRKKnT55Do95tDdPp1";
+  const token = req.headers.authorization;
+  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+
+  const tokenDecoded = await verifyTokenCorrectness(token);
+  if (!tokenDecoded.success) {
+      res.json(tokenDecoded);
+      return;
+  }
+  const userId = tokenDecoded.uid;
   const {id} = req.params;
-  sql.query(`SELECT * from pasto where _id='${id}' LIMIT 1`, (err, result) => {
+    sql.query(`SELECT * from pasto where _id='${id}' and id_google_utente='${userId}' LIMIT 1`, (err, result) => {
     if (err) {
       console.log("error: ", err);
       res.json({success: false, error: err})
@@ -249,8 +305,15 @@ app.get('/meals/:id', function(req, res) {
 });
 
 app.post('/meals', function(req, res) {
-  // check if token is valid
-  const userId = "uje3LNinlBQRKKnT55Do95tDdPp1";
+  const token = req.headers.authorization;
+  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+
+  const tokenDecoded = await verifyTokenCorrectness(token);
+  if (!tokenDecoded.success) {
+      res.json(tokenDecoded);
+      return;
+  }
+  const userId = tokenDecoded.uid;
   const {id} = req.params;
 
   const newMeal = req.body;
@@ -270,14 +333,21 @@ app.post('/meals', function(req, res) {
 });
 
 app.put('/meals/:id', function(req, res) {
-  // check if token is valid
-  const userId = "uje3LNinlBQRKKnT55Do95tDdPp1";
+  const token = req.headers.authorization;
+  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+
+  const tokenDecoded = await verifyTokenCorrectness(token);
+  if (!tokenDecoded.success) {
+      res.json(tokenDecoded);
+      return;
+  }
+  const userId = tokenDecoded.uid;
   const {id} = req.params;
 
   const newMeal = req.body;
 
-  sql.query("UPDATE pasto SET nome = ?, quantita_croccantini = ?, quantita_umido = ?, note = ?, pasto_dieta_id = ?, data = ?, ora = ? WHERE _id = ?", [
-    newMeal.nome, newMeal.quantita_croccantini, newMeal.quantita_umido, newMeal.note, newMeal.pasto_dieta_id, newMeal.data, newMeal.ora, id
+    sql.query("UPDATE pasto SET nome = ?, quantita_croccantini = ?, quantita_umido = ?, note = ?, pasto_dieta_id = ?, data = ?, ora = ? WHERE _id = ? and id_google_utente = ?", [
+        newMeal.nome, newMeal.quantita_croccantini, newMeal.quantita_umido, newMeal.note, newMeal.pasto_dieta_id, newMeal.data, newMeal.ora, id, userId
   ], (err, result) => {
     if (err) {
       console.log("error: ", err);
@@ -292,11 +362,18 @@ app.put('/meals/:id', function(req, res) {
 });
 
 app.delete('/meals/:id', function(req, res) {
-  // check if token is valid
-  const userId = "uje3LNinlBQRKKnT55Do95tDdPp1";
+  const token = req.headers.authorization;
+  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+
+  const tokenDecoded = await verifyTokenCorrectness(token);
+  if (!tokenDecoded.success) {
+      res.json(tokenDecoded);
+      return;
+  }
+  const userId = tokenDecoded.uid;
   const {id} = req.params;
 
-  sql.query("DELETE FROM pasto WHERE _id = ?", id, (err, result) => {
+    sql.query("DELETE FROM pasto WHERE _id = ? and id_google_utente = ?", [id, userId], (err, result) => {
     if (err) {
       console.log("error: ", err);
       res.json({success: false, error: err});
@@ -312,8 +389,15 @@ app.delete('/meals/:id', function(req, res) {
 // *** DIET ******
 
 app.get('/diets', function(req, res) {
-  // check if token is valid
-  const userId = "uje3LNinlBQRKKnT55Do95tDdPp1";
+  const token = req.headers.authorization;
+  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+
+  const tokenDecoded = await verifyTokenCorrectness(token);
+  if (!tokenDecoded.success) {
+      res.json(tokenDecoded);
+      return;
+  }
+  const userId = tokenDecoded.uid;
   sql.query(`SELECT * from dieta where id_google_utente='${userId}'`, (err, result) => {
     if (err) {
       console.log("error: ", err);
@@ -328,10 +412,17 @@ app.get('/diets', function(req, res) {
 });
 
 app.get('/diets/:id', function(req, res) {
-  // check if token is valid
-  const userId = "uje3LNinlBQRKKnT55Do95tDdPp1";
+  const token = req.headers.authorization;
+  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+
+  const tokenDecoded = await verifyTokenCorrectness(token);
+  if (!tokenDecoded.success) {
+      res.json(tokenDecoded);
+      return;
+  }
+  const userId = tokenDecoded.uid;
   const {id} = req.params;
-  sql.query(`SELECT * from dieta where _id='${id}' LIMIT 1`, (err, result) => {
+    sql.query(`SELECT * from dieta where _id='${id}' and id_google_utente='${userId}' LIMIT 1`, (err, result) => {
     if (err) {
       console.log("error: ", err);
       res.json({success: false, error: err})
@@ -352,8 +443,15 @@ app.get('/diets/:id', function(req, res) {
 });
 
 app.get('/diets/last', function(req, res) {
-  // check if token is valid
-  const userId = "uje3LNinlBQRKKnT55Do95tDdPp1";
+  const token = req.headers.authorization;
+  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+
+  const tokenDecoded = await verifyTokenCorrectness(token);
+  if (!tokenDecoded.success) {
+      res.json(tokenDecoded);
+      return;
+  }
+  const userId = tokenDecoded.uid;
   sql.query(`SELECT * from dieta where id_google_utente='${userId}' ORDER BY _id DESC LIMIT 1`, (err, result) => {
     if (err) {
       console.log("error: ", err);
@@ -375,8 +473,15 @@ app.get('/diets/last', function(req, res) {
 });
 
 app.post('/diets', function(req, res) {
-  // check if token is valid
-  const userId = "uje3LNinlBQRKKnT55Do95tDdPp1";
+  const token = req.headers.authorization;
+  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+
+  const tokenDecoded = await verifyTokenCorrectness(token);
+  if (!tokenDecoded.success) {
+      res.json(tokenDecoded);
+      return;
+  }
+  const userId = tokenDecoded.uid;
   const {id} = req.params;
 
   const newDiet = req.body;
@@ -395,14 +500,21 @@ app.post('/diets', function(req, res) {
 });
 
 app.put('/diets/:id', function(req, res) {
-  // check if token is valid
-  const userId = "uje3LNinlBQRKKnT55Do95tDdPp1";
+  const token = req.headers.authorization;
+  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+
+  const tokenDecoded = await verifyTokenCorrectness(token);
+  if (!tokenDecoded.success) {
+      res.json(tokenDecoded);
+      return;
+  }
+  const userId = tokenDecoded.uid;
   const {id} = req.params;
 
   const newDiet = req.body;
 
-  sql.query("UPDATE dieta SET nome_dieta = ?, note = ?, dieta_attiva = ?, dieta_animale_id = ?, dieta_dispenser_id = ? WHERE _id = ?", [
-    newDiet.nome_dieta, newDiet.note, newDiet.dieta_attiva, newDiet.dieta_animale_id, newDiet.dieta_dispenser_id, id
+    sql.query("UPDATE dieta SET nome_dieta = ?, note = ?, dieta_attiva = ?, dieta_animale_id = ?, dieta_dispenser_id = ? WHERE _id = ? and id_google_utente = ?", [
+        newDiet.nome_dieta, newDiet.note, newDiet.dieta_attiva, newDiet.dieta_animale_id, newDiet.dieta_dispenser_id, id, userId
   ], (err, result) => {
     if (err) {
       console.log("error: ", err);
@@ -417,12 +529,20 @@ app.put('/diets/:id', function(req, res) {
 });
 
 app.delete('/diets/:id', function(req, res) {
-  const userId = "uje3LNinlBQRKKnT55Do95tDdPp1";
+  const token = req.headers.authorization;
+  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+
+  const tokenDecoded = await verifyTokenCorrectness(token);
+  if (!tokenDecoded.success) {
+      res.json(tokenDecoded);
+      return;
+  }
+  const userId = tokenDecoded.uid;
   const {id} = req.params;
 
   const newAnimal = req.body;
 
-  sql.query("DELETE FROM dieta WHERE _id = ?", id, (err, result) => {
+    sql.query("DELETE FROM dieta WHERE _id = ? and id_google_utente = ?", [id, userId], (err, result) => {
     if (err) {
       console.log("error: ", err);
       res.json({success: false, error: err});
@@ -436,10 +556,17 @@ app.delete('/diets/:id', function(req, res) {
 });
 
 app.get('/diets/:id/meal', function(req, res) {
-  // check if token is valid
-  const userId = "uje3LNinlBQRKKnT55Do95tDdPp1";
+  const token = req.headers.authorization;
+  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+
+  const tokenDecoded = await verifyTokenCorrectness(token);
+  if (!tokenDecoded.success) {
+      res.json(tokenDecoded);
+      return;
+  }
+  const userId = tokenDecoded.uid;
   const {id} = req.params;
-  sql.query(`select * from pasto where pasto_dieta_id='${id}'`, (err, result) => {
+    sql.query(`select * from pasto where pasto_dieta_id='${id}' and id_google_utente='${userId}'`, (err, result) => {
     if (err) {
       console.log("error: ", err);
       res.json({success: false, error: err})
@@ -455,8 +582,15 @@ app.get('/diets/:id/meal', function(req, res) {
 //++++++++++++ DISPENSER +++++++++++++++
 
 app.get('/dispenser', function(req, res) {
-  // check if token is valid
-  const userId = "uje3LNinlBQRKKnT55Do95tDdPp1";
+ const token = req.headers.authorization;
+  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+
+  const tokenDecoded = await verifyTokenCorrectness(token);
+  if (!tokenDecoded.success) {
+      res.json(tokenDecoded);
+      return;
+  }
+  const userId = tokenDecoded.uid;
   const filters = [];
 
   Object.keys(req.query).forEach((key) => {
@@ -485,10 +619,17 @@ app.get('/dispenser', function(req, res) {
 });
 
 app.get('/dispenser/:id', function(req, res) {
-  // check if token is valid
-  const userId = "uje3LNinlBQRKKnT55Do95tDdPp1";
+  const token = req.headers.authorization;
+  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+
+  const tokenDecoded = await verifyTokenCorrectness(token);
+  if (!tokenDecoded.success) {
+      res.json(tokenDecoded);
+      return;
+  }
+  const userId = tokenDecoded.uid;
   const {id} = req.params;
-  sql.query(`SELECT * from dispenser where _id='${id}'`, (err, result) => {
+    sql.query(`SELECT * from dispenser where _id='${id}' and id_google_utente='${userId}'`, (err, result) => {
     if (err) {
       console.log("error: ", err);
       res.json({success: false, error: err})
@@ -522,14 +663,21 @@ app.post('/dispenser', function(req, res) {
 });
 
 app.put('/dispenser/:id', function(req, res) {
-  // check if token is valid
-  const userId = "uje3LNinlBQRKKnT55Do95tDdPp1";
+  const token = req.headers.authorization;
+  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+
+  const tokenDecoded = await verifyTokenCorrectness(token);
+  if (!tokenDecoded.success) {
+      res.json(tokenDecoded);
+      return;
+  }
+  const userId = tokenDecoded.uid;
   const {id} = req.params;
 
   const newDispenser = req.body;
 
-  sql.query("UPDATE dispenser SET nome = ?, codice_bluetooth = ? WHERE _id = ?", [
-    newDispenser.nome, newDispenser.codice_bluetooth, id
+    sql.query("UPDATE dispenser SET nome = ?, codice_bluetooth = ? WHERE _id = ? and and id_google_utente = ?", [
+        newDispenser.nome, newDispenser.codice_bluetooth, id, userId
   ], (err, result) => {
     if (err) {
       console.log("error: ", err);
@@ -544,12 +692,20 @@ app.put('/dispenser/:id', function(req, res) {
 });
 
 app.delete('/dispenser/:id', function(req, res) {
-  const userId = "uje3LNinlBQRKKnT55Do95tDdPp1";
+  const token = req.headers.authorization;
+  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+
+  const tokenDecoded = await verifyTokenCorrectness(token);
+  if (!tokenDecoded.success) {
+      res.json(tokenDecoded);
+      return;
+  }
+  const userId = tokenDecoded.uid;
   const {id} = req.params;
 
   const newAnimal = req.body;
 
-  sql.query("DELETE FROM dispenser WHERE _id = ?", id, (err, result) => {
+    sql.query("DELETE FROM dispenser WHERE _id = ? and and id_google_utente = ?", id, (err, result) => {
     if (err) {
       console.log("error: ", err);
       res.json({success: false, error: err});
@@ -563,10 +719,17 @@ app.delete('/dispenser/:id', function(req, res) {
 });
 
 app.get('/dispenser/:id/diet', function(req, res) {
-  // check if token is valid
-  const userId = "uje3LNinlBQRKKnT55Do95tDdPp1";
+  const token = req.headers.authorization;
+  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+
+  const tokenDecoded = await verifyTokenCorrectness(token);
+  if (!tokenDecoded.success) {
+      res.json(tokenDecoded);
+      return;
+  }
+  const userId = tokenDecoded.uid;
   const {id} = req.params;
-  sql.query(`select * from dieta where dieta_dispenser_id='${id}' LIMIT 1`, (err, result) => {
+    sql.query(`select * from dieta where dieta_dispenser_id='${id}' and id_google_utente='${userId}' LIMIT 1`, (err, result) => {
     if (err) {
       console.log("error: ", err);
       res.json({success: false, error: err})
