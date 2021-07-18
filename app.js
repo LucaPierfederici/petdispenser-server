@@ -34,7 +34,7 @@ admin.initializeApp({
  * Example get method *
  **********************/
 
-function verifyTokenCorrectness(idToken) {
+async function verifyTokenCorrectness(idToken) {
     // idToken comes from the client app
     return admin
         .auth()
@@ -62,7 +62,7 @@ app.get('/checktoken', async function(req, res) {
 
 });
 
-app.get('/animals', function (req, res) {
+app.get('/animals', async function (req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
@@ -98,7 +98,7 @@ app.get('/animals', function (req, res) {
   });
 });
 
-app.get('/animals/:id', function(req, res) {
+app.get('/animals/:id', async function(req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
@@ -128,7 +128,7 @@ app.get('/animals/:id', function(req, res) {
   });
 });
 
-app.post('/animals', function(req, res) {
+app.post('/animals', async function(req, res) {
     const token = req.headers.authorization;
     if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
@@ -156,7 +156,7 @@ app.post('/animals', function(req, res) {
   });
 });
 
-app.put('/animals/:id', function(req, res) {
+app.put('/animals/:id', async function(req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
@@ -185,7 +185,7 @@ app.put('/animals/:id', function(req, res) {
   });
 });
 
-app.delete('/animals/:id', function(req, res) {
+app.delete('/animals/:id', async function(req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
@@ -212,7 +212,7 @@ app.delete('/animals/:id', function(req, res) {
   });
 });
 
-app.get('/animals/:id/diets', function(req, res) {
+app.get('/animals/:id/diets', async function(req, res) {
  const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
@@ -237,7 +237,7 @@ app.get('/animals/:id/diets', function(req, res) {
   });
 });
 
-app.get('/meals', function(req, res) {
+app.get('/meals', async function(req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
@@ -274,7 +274,7 @@ app.get('/meals', function(req, res) {
   });
 });
 
-app.get('/meals/:id', function(req, res) {
+app.get('/meals/:id', async function(req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
@@ -304,7 +304,7 @@ app.get('/meals/:id', function(req, res) {
   });
 });
 
-app.post('/meals', function(req, res) {
+app.post('/meals', async function(req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
@@ -332,7 +332,7 @@ app.post('/meals', function(req, res) {
   });
 });
 
-app.put('/meals/:id', function(req, res) {
+app.put('/meals/:id',async function(req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
@@ -361,7 +361,7 @@ app.put('/meals/:id', function(req, res) {
   });
 });
 
-app.delete('/meals/:id', function(req, res) {
+app.delete('/meals/:id', async function(req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
@@ -388,7 +388,7 @@ app.delete('/meals/:id', function(req, res) {
 
 // *** DIET ******
 
-app.get('/diets', function(req, res) {
+app.get('/diets', async function(req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
@@ -411,7 +411,7 @@ app.get('/diets', function(req, res) {
   });
 });
 
-app.get('/diets/:id', function(req, res) {
+app.get('/diets/:id', async function(req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
@@ -442,7 +442,7 @@ app.get('/diets/:id', function(req, res) {
   });
 });
 
-app.get('/diets/last', function(req, res) {
+app.get('/diets/last', async function(req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
@@ -472,7 +472,7 @@ app.get('/diets/last', function(req, res) {
   });
 });
 
-app.post('/diets', function(req, res) {
+app.post('/diets', async function(req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
@@ -499,7 +499,7 @@ app.post('/diets', function(req, res) {
   });
 });
 
-app.put('/diets/:id', function(req, res) {
+app.put('/diets/:id', async function(req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
@@ -528,7 +528,7 @@ app.put('/diets/:id', function(req, res) {
   });
 });
 
-app.delete('/diets/:id', function(req, res) {
+app.delete('/diets/:id', async function(req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
@@ -555,7 +555,7 @@ app.delete('/diets/:id', function(req, res) {
   });
 });
 
-app.get('/diets/:id/meal', function(req, res) {
+app.get('/diets/:id/meal', async function(req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
@@ -581,7 +581,7 @@ app.get('/diets/:id/meal', function(req, res) {
 
 //++++++++++++ DISPENSER +++++++++++++++
 
-app.get('/dispenser', function(req, res) {
+app.get('/dispenser', async function(req, res) {
  const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
@@ -618,7 +618,7 @@ app.get('/dispenser', function(req, res) {
   });
 });
 
-app.get('/dispenser/:id', function(req, res) {
+app.get('/dispenser/:id', async function(req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
@@ -642,7 +642,7 @@ app.get('/dispenser/:id', function(req, res) {
   });
 });
 
-app.post('/dispenser', function(req, res) {
+app.post('/dispenser', async function(req, res) {
   // check if token is valid
   const userId = "uje3LNinlBQRKKnT55Do95tDdPp1";
   const {id} = req.params;
@@ -662,7 +662,7 @@ app.post('/dispenser', function(req, res) {
   });
 });
 
-app.put('/dispenser/:id', function(req, res) {
+app.put('/dispenser/:id', async function(req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
@@ -691,7 +691,7 @@ app.put('/dispenser/:id', function(req, res) {
   });
 });
 
-app.delete('/dispenser/:id', function(req, res) {
+app.delete('/dispenser/:id', async function(req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
@@ -718,7 +718,7 @@ app.delete('/dispenser/:id', function(req, res) {
   });
 });
 
-app.get('/dispenser/:id/diet', function(req, res) {
+app.get('/dispenser/:id/diet', async function(req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
@@ -742,7 +742,7 @@ app.get('/dispenser/:id/diet', function(req, res) {
   });
 });
 
-app.get('/item/*', function(req, res) {
+app.get('/item/*', async function(req, res) {
   // Add your code here
   res.json({success: 'get call succeed!', url: req.url});
 });
