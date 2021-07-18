@@ -111,7 +111,9 @@ app.get('/animals/:id', async function(req, res) {
   } catch(err) {
       res.json(err);
       return;
-  }
+    }
+
+
   
   const userId = tokenDecoded.uid;
   const {id} = req.params;
@@ -178,7 +180,18 @@ app.put('/animals/:id', async function(req, res) {
   const userId = tokenDecoded.uid;
   const {id} = req.params;
 
-  const newAnimal = req.body;
+    const newAnimal = req.body;
+
+    sql.query(`SELECT * from animale  where _id = ? and id_google_utente = ?`, [id, userId], (err, result) => {
+        if (err) {
+            console.log("error: ", err);
+            res.json({ success: false, error: err })
+            return;
+        }
+
+        if (result.length == 0)
+            res.json({ success: false, error: "user not authorized" })
+    });
 
     sql.query("UPDATE animale SET nome_animale = ?, path = ?, tipologia = ?, razza = ?, peso = ?, ddn = ? WHERE _id = ? and id_google_utente= ?", [
         newAnimal.nome_animale, newAnimal.path, newAnimal.tipologia, newAnimal.razza, newAnimal.peso, newAnimal.ddn, id, userId
@@ -210,7 +223,18 @@ app.delete('/animals/:id', async function(req, res) {
   const userId = tokenDecoded.uid;
   const {id} = req.params;
 
-  const newAnimal = req.body;
+    const newAnimal = req.body;
+
+    sql.query(`SELECT * from animale where _id = ? and id_google_utente = ?`, [id, userId], (err, result) => {
+        if (err) {
+            console.log("error: ", err);
+            res.json({ success: false, error: err })
+            return;
+        }
+
+        if (result.length == 0)
+            res.json({ success: false, error: "user not authorized" })
+    });
 
     sql.query("DELETE FROM animale WHERE _id = ? and id_google_utente= ?", [id, userId], (err, result) => {
     if (err) {
@@ -372,7 +396,18 @@ app.put('/meals/:id',async function(req, res) {
   const userId = tokenDecoded.uid;
   const {id} = req.params;
 
-  const newMeal = req.body;
+    const newMeal = req.body;
+
+    sql.query(`SELECT * from pasto where _id = ? and id_google_utente = ?`, [id, userId], (err, result) => {
+        if (err) {
+            console.log("error: ", err);
+            res.json({ success: false, error: err })
+            return;
+        }
+
+        if (result.length == 0)
+            res.json({ success: false, error: "user not authorized" })
+    });
 
     sql.query("UPDATE pasto SET nome = ?, quantita_croccantini = ?, quantita_umido = ?, note = ?, pasto_dieta_id = ?, data = ?, ora = ? WHERE _id = ? and id_google_utente = ?", [
         newMeal.nome, newMeal.quantita_croccantini, newMeal.quantita_umido, newMeal.note, newMeal.pasto_dieta_id, newMeal.data, newMeal.ora, id, userId
@@ -492,18 +527,6 @@ app.get('/diets/last', async function(req, res) {
   }
 
     const userId = tokenDecoded.uid;
-
-    sql.query(`SELECT * from animale where _id = ? and id_google_utente = ?`, [newDiet.dieta_animale_id, userId], (err, result) => {
-        if (err) {
-            console.log("error: ", err);
-            res.json({ success: false, error: err })
-            return;
-        }
-
-        if (result.length == 0)
-            res.json({ success: false, error: "user not authorized" })
-    });
-
 
   sql.query(`SELECT * from dieta where id_google_utente='${userId}' ORDER BY _id DESC LIMIT 1`, (err, result) => {
     if (err) {
@@ -627,7 +650,7 @@ app.delete('/diets/:id', async function(req, res) {
 
     const newAnimal = req.body;
 
-    sql.query(`SELECT * from animale where _id = ? and id_google_utente = ?`, [newDiet.dieta_animale_id, userId], (err, result) => {
+    sql.query(`SELECT * from dieta where _id = ? and id_google_utente = ?`, [id, userId], (err, result) => {
         if (err) {
             console.log("error: ", err);
             res.json({ success: false, error: err })
@@ -782,7 +805,18 @@ app.put('/dispenser/:id', async function(req, res) {
   const userId = tokenDecoded.uid;
   const {id} = req.params;
 
-  const newDispenser = req.body;
+    const newDispenser = req.body;
+
+    sql.query(`SELECT * from dispenser where where _id = ? and id_google_utente = ?`, [id, userId], (err, result) => {
+        if (err) {
+            console.log("error: ", err);
+            res.json({ success: false, error: err })
+            return;
+        }
+
+        if (result.length == 0)
+            res.json({ success: false, error: "user not authorized" })
+    });
 
     sql.query("UPDATE dispenser SET nome = ?, codice_bluetooth = ? WHERE _id = ? and and id_google_utente = ?", [
         newDispenser.nome, newDispenser.codice_bluetooth, id, userId
@@ -814,7 +848,18 @@ app.delete('/dispenser/:id', async function(req, res) {
   const userId = tokenDecoded.uid;
   const {id} = req.params;
 
-  const newAnimal = req.body;
+    const newAnimal = req.body;
+
+    sql.query(`SELECT * from dispenser where where _id = ? and id_google_utente = ?`, [id, userId], (err, result) => {
+        if (err) {
+            console.log("error: ", err);
+            res.json({ success: false, error: err })
+            return;
+        }
+
+        if (result.length == 0)
+            res.json({ success: false, error: "user not authorized" })
+    });
 
     sql.query("DELETE FROM dispenser WHERE _id = ? and and id_google_utente = ?", id, (err, result) => {
     if (err) {
