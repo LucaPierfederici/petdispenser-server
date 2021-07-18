@@ -109,7 +109,7 @@ app.get('/animals/:id', async function(req, res) {
   }
   const userId = tokenDecoded.uid;
   const {id} = req.params;
-    sql.query(`SELECT * from animale where _id='${id} and id_google_utente='${userId}' LIMIT 1`, (err, result) => {
+    sql.query(`SELECT * from animale where _id='${id}' and id_google_utente='${userId}' LIMIT 1`, (err, result) => {
     if (err) {
       console.log("error: ", err);
       res.json({success: false, error: err})
