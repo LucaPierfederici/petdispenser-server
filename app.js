@@ -12,6 +12,7 @@ var bodyParser = require('body-parser')
 var awsServerlessExpressMiddleware = require('aws-serverless-express/middleware')
 const sql = require("./db.config.js");
 var admin = require("firebase-admin");
+const serviceAccount = require('serviceAccount.json');
 
 // declare a new express app
 var app = express()
@@ -25,7 +26,9 @@ app.use(function(req, res, next) {
   next()
 });
 
-admin.initializeApp();
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
+});
 
 /**********************
  * Example get method *
