@@ -490,8 +490,21 @@ app.get('/diets/last', async function(req, res) {
       res.json(err);
       return;
   }
-  
-  const userId = tokenDecoded.uid;
+
+    const userId = tokenDecoded.uid;
+
+    sql.query(`SELECT * from animale where _id = ? and id_google_utente = ?`, [newDiet.dieta_animale_id, userId], (err, result) => {
+        if (err) {
+            console.log("error: ", err);
+            res.json({ success: false, error: err })
+            return;
+        }
+
+        if (result.length == 0)
+            res.json({ success: false, error: "user not authorized" })
+    });
+
+
   sql.query(`SELECT * from dieta where id_google_utente='${userId}' ORDER BY _id DESC LIMIT 1`, (err, result) => {
     if (err) {
       console.log("error: ", err);
@@ -526,8 +539,20 @@ app.post('/diets', async function(req, res) {
   
   const userId = tokenDecoded.uid;
   const {id} = req.params;
-
+  
   const newDiet = req.body;
+    sql.query(`SELECT * from animale where _id = ? and id_google_utente = ?`, [newDiet.dieta_animale_id, userId], (err, result) => {
+        if (err) {
+            console.log("error: ", err);
+            res.json({ success: false, error: err })
+            return;
+        }
+
+        if (result.length == 0)
+            res.json({ success:false,error:"user not authorized" })
+    });
+
+
 
   sql.query("INSERT INTO dieta SET ?", newDiet, (err, result) => {
     if (err) {
@@ -557,7 +582,18 @@ app.put('/diets/:id', async function(req, res) {
   const userId = tokenDecoded.uid;
   const {id} = req.params;
 
-  const newDiet = req.body;
+    const newDiet = req.body;
+
+    sql.query(`SELECT * from animale where _id = ? and id_google_utente = ?`, [newDiet.dieta_animale_id, userId], (err, result) => {
+        if (err) {
+            console.log("error: ", err);
+            res.json({ success: false, error: err })
+            return;
+        }
+
+        if (result.length == 0)
+            res.json({ success: false, error: "user not authorized" })
+    });
 
     sql.query("UPDATE dieta SET nome_dieta = ?, note = ?, dieta_attiva = ?, dieta_animale_id = ?, dieta_dispenser_id = ? WHERE _id = ? and id_google_utente = ?", [
         newDiet.nome_dieta, newDiet.note, newDiet.dieta_attiva, newDiet.dieta_animale_id, newDiet.dieta_dispenser_id, id, userId
@@ -589,7 +625,18 @@ app.delete('/diets/:id', async function(req, res) {
   const userId = tokenDecoded.uid;
   const {id} = req.params;
 
-  const newAnimal = req.body;
+    const newAnimal = req.body;
+
+    sql.query(`SELECT * from animale where _id = ? and id_google_utente = ?`, [newDiet.dieta_animale_id, userId], (err, result) => {
+        if (err) {
+            console.log("error: ", err);
+            res.json({ success: false, error: err })
+            return;
+        }
+
+        if (result.length == 0)
+            res.json({ success: false, error: "user not authorized" })
+    });
 
     sql.query("DELETE FROM dieta WHERE _id = ? and id_google_utente = ?", [id, userId], (err, result) => {
     if (err) {
