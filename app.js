@@ -20,14 +20,14 @@ app.use(bodyParser.json())
 app.use(awsServerlessExpressMiddleware.eventContext())
 
 // Enable CORS for all methods
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*")
   res.header("Access-Control-Allow-Headers", "*")
   next()
 });
 
 admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount)
+  credential: admin.credential.cert(serviceAccount)
 });
 
 /**********************
@@ -35,30 +35,33 @@ admin.initializeApp({
  **********************/
 
 async function verifyTokenCorrectness(idToken) {
-    // idToken comes from the client app
-    return admin
-        .auth()
-        .verifyIdToken(idToken)
-        .then((decodedToken) => {
-            const uid = decodedToken.uid;
-            return {
-                uid, success: true
-            };
-        })
-        .catch((error) => {
-            return {
-                error, success: false
-            };
-        });
+  // idToken comes from the client app
+  return admin
+    .auth()
+    .verifyIdToken(idToken)
+    .then((decodedToken) => {
+      const uid = decodedToken.uid;
+      return {
+        uid, success: true
+      };
+    })
+    .catch((error) => {
+      return {
+        error, success: false
+      };
+    });
 }
 
-app.get('/checktoken', async function(req, res) {
-    // Add your code here
-    const token = req.headers.authorization;
-    if (!token) res.json({ success: false, error: 'tokenNotFound' });
+app.get('/checktoken', async function (req, res) {
+  // Add your code here
+  const token = req.headers.authorization;
+  if (!token) {
+    res.json({ success: false, error: 'tokenNotFound' });
+    return;
+  }
 
-    const oi = await verifyTokenCorrectness(token);
-    res.json(oi);
+  const oi = await verifyTokenCorrectness(token);
+  res.json(oi);
 
 });
 
@@ -69,23 +72,26 @@ app.get('/checktoken', async function(req, res) {
  */
 app.get('/animals', async function (req, res) {
   const token = req.headers.authorization;
-  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+  if (!token) {
+    res.json({ success: false, error: 'tokenNotFound' });
+    return;
+  }
 
   let tokenDecoded;
   try {
     tokenDecoded = await verifyTokenCorrectness(token);
-  } catch(err) {
-      res.json(err);
-      return;
+  } catch (err) {
+    res.json(err);
+    return;
   }
-  
+
   const userId = tokenDecoded.uid;
   const filters = [];
 
   Object.keys(req.query).forEach((key) => {
     switch (key) {
       case 'name':
-        if(req.query[key])
+        if (req.query[key])
           filters.push(`AND nome = '${req.query[key]}'`);
         break;
       default:
@@ -96,63 +102,70 @@ app.get('/animals', async function (req, res) {
   sql.query(query, (err, result) => {
     if (err) {
       console.log("error: ", err);
-      res.json({success: false, error: err});
+      res.json({ success: false, error: err });
       return;
     }
 
     console.log("users: ", result);
-    res.json({success: true, result});
+    res.json({ success: true, result });
     return;
   });
 });
 
-app.get('/animals/:id', async function(req, res) {
+app.get('/animals/:id', async function (req, res) {
   const token = req.headers.authorization;
-  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+  if (!token) {
+    res.json({ success: false, error: 'tokenNotFound' });
+    return;
+  }
 
   let tokenDecoded;
   try {
     tokenDecoded = await verifyTokenCorrectness(token);
-  } catch(err) {
-      res.json(err);
-      return;
-    }
+  } catch (err) {
+    res.json(err);
+    return;
+  }
 
 
-  
+
   const userId = tokenDecoded.uid;
-  const {id} = req.params;
-    sql.query(`SELECT * from animale where _id='${id}' and id_google_utente='${userId}' LIMIT 1`, (err, result) => {
+  const { id } = req.params;
+  sql.query(`SELECT * from animale where _id='${id}' and id_google_utente='${userId}' LIMIT 1`, (err, result) => {
     if (err) {
       console.log("error: ", err);
-      res.json({success: false, error: err})
+      res.json({ success: false, error: err })
       return;
     }
 
     if (!result.length) {
       console.log("error: ", err);
-      res.json({success: false, error: "Animal not found"});
+      res.json({ success: false, error: "Animal not found" });
       return;
     }
 
     console.log("animalID: ", result);
-    res.json({success: true, result: result[0]});
+    res.json({ success: true, result: result[0] });
     return;
   });
 });
 
-app.post('/animals', async function(req, res) {
-    const token = req.headers.authorization;
-    if (!token) res.json({ success: false, error: 'tokenNotFound' });
+app.post('/animals', async function (req, res) {
+  const token = req.headers.authorization;
+  if (!token) {
+    res.json({ success: false, error: 'tokenNotFound' });
+    return;
+  }
 
-    let tokenDecoded;
-    try {
-      tokenDecoded = await verifyTokenCorrectness(token);
-    } catch(err) {
-      res.json(err);
-    }
-    const userId = tokenDecoded.uid;
-  const {id} = req.params;
+  let tokenDecoded;
+  try {
+    tokenDecoded = await verifyTokenCorrectness(token);
+  } catch (err) {
+    res.json(err);
+    return;
+  }
+  const userId = tokenDecoded.uid;
+  const { id } = req.params;
 
   const newAnimal = req.body;
   console.log("newAnimal: ", newAnimal);
@@ -160,115 +173,126 @@ app.post('/animals', async function(req, res) {
   sql.query("INSERT INTO animale SET ?", newAnimal, (err, result) => {
     if (err) {
       console.log("error: ", err);
-      res.json({success: false, error: err});
+      res.json({ success: false, error: err });
       return;
     }
 
     console.log("animal: ", result);
-    res.json({success: true, result});
+    res.json({ success: true, result });
     return;
   });
 });
 
-app.put('/animals/:id', async function(req, res) {
+app.put('/animals/:id', async function (req, res) {
   const token = req.headers.authorization;
-  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+  if (!token) {
+    res.json({ success: false, error: 'tokenNotFound' });
+    return;
+  }
 
   let tokenDecoded;
   try {
     tokenDecoded = await verifyTokenCorrectness(token);
-  } catch(err) {
-      res.json(err);
-      return;
+  } catch (err) {
+    res.json(err);
+    return;
   }
-  
+
   const userId = tokenDecoded.uid;
-  const {id} = req.params;
+  const { id } = req.params;
 
-    const newAnimal = req.body;
+  const newAnimal = req.body;
 
-    
 
-    sql.query("UPDATE animale SET nome_animale = ?, path = ?, tipologia = ?, razza = ?, peso = ?, ddn = ? WHERE _id = ? and id_google_utente= ?", [
-        newAnimal.nome_animale, newAnimal.path, newAnimal.tipologia, newAnimal.razza, newAnimal.peso, newAnimal.ddn, id, userId
+
+  sql.query("UPDATE animale SET nome_animale = ?, path = ?, tipologia = ?, razza = ?, peso = ?, ddn = ? WHERE _id = ? and id_google_utente= ?", [
+    newAnimal.nome_animale, newAnimal.path, newAnimal.tipologia, newAnimal.razza, newAnimal.peso, newAnimal.ddn, id, userId
   ], (err, result) => {
     if (err) {
       console.log("error: ", err);
-      res.json({success: false, error: err});
+      res.json({ success: false, error: err });
       return;
     }
 
     console.log("animal: ", result);
-    res.json({success: true, result});
+    res.json({ success: true, result });
     return;
   });
 });
 
-app.delete('/animals/:id', async function(req, res) {
+app.delete('/animals/:id', async function (req, res) {
   const token = req.headers.authorization;
-  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+  if (!token) {
+    res.json({ success: false, error: 'tokenNotFound' });
+    return;
+  }
 
   let tokenDecoded;
   try {
     tokenDecoded = await verifyTokenCorrectness(token);
-  } catch(err) {
-      res.json(err);
-      return;
+  } catch (err) {
+    res.json(err);
+    return;
   }
-  
+
   const userId = tokenDecoded.uid;
-  const {id} = req.params;
+  const { id } = req.params;
 
-    const newAnimal = req.body;
+  const newAnimal = req.body;
 
-    sql.query(`SELECT * from animale where _id = ? and id_google_utente = ?`, [id, userId], (err, result) => {
-        if (err) {
-            console.log("error: ", err);
-            res.json({ success: false, error: err })
-            return;
-        }
-
-        if (result.length == 0)
-            res.json({ success: false, error: "user not authorized" })
-    });
-
-    sql.query("DELETE FROM animale WHERE _id = ? and id_google_utente= ?", [id, userId], (err, result) => {
+  sql.query(`SELECT * from animale where _id = ? and id_google_utente = ?`, [id, userId], (err, result) => {
     if (err) {
       console.log("error: ", err);
-      res.json({success: false, error: err});
+      res.json({ success: false, error: err })
+      return;
+    }
+
+    if (result.length == 0) {
+      res.json({ success: false, error: "user not authorized" });
+      return;
+    }
+  });
+
+  sql.query("DELETE FROM animale WHERE _id = ? and id_google_utente= ?", [id, userId], (err, result) => {
+    if (err) {
+      console.log("error: ", err);
+      res.json({ success: false, error: err });
       return;
     }
 
     console.log("animal: ", result);
-    res.json({success: true, result});
+    res.json({ success: true, result });
     return;
   });
 });
 
-app.get('/animals/:id/diets', async function(req, res) {
- const token = req.headers.authorization;
-  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+app.get('/animals/:id/diets', async function (req, res) {
+  const token = req.headers.authorization;
+  if (!token) {
+    res.json({ success: false, error: 'tokenNotFound' });
+    return;
+  }
 
   let tokenDecoded;
   try {
     tokenDecoded = await verifyTokenCorrectness(token);
-  } catch(err) {
-      res.json(err);
-      return;
+  } catch (err) {
+    res.json(err);
+    return;
   }
-  
+
   const userId = tokenDecoded.uid;
-  const {id} = req.params;
+  const { id } = req.params;
 
   sql.query(`SELECT * from dieta where dieta_animale_id='${id}' AND id_google_utente='${userId}'`, (err, result) => {
     if (err) {
       console.log("error: ", err);
-      res.json({success: false, error: err});
+      res.json({ success: false, error: err });
       return;
     }
 
     console.log("users: ", result);
-    res.json({success: true, result});
+    res.json({ success: true, result });
     return;
   });
 });
@@ -278,25 +302,28 @@ app.get('/animals/:id/diets', async function(req, res) {
  * These api will communicate with the meals's table
  */
 
-app.get('/meals', async function(req, res) {
+app.get('/meals', async function (req, res) {
   const token = req.headers.authorization;
-  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+  if (!token) {
+    res.json({ success: false, error: 'tokenNotFound' });
+    return;
+  }
 
   let tokenDecoded;
   try {
     tokenDecoded = await verifyTokenCorrectness(token);
-  } catch(err) {
-      res.json(err);
-      return;
+  } catch (err) {
+    res.json(err);
+    return;
   }
-  
+
   const userId = tokenDecoded.uid;
   const filters = [];
 
   Object.keys(req.query).forEach((key) => {
     switch (key) {
       case 'date':
-        if(req.query[key])
+        if (req.query[key])
           filters.push(`AND data = '${req.query[key]}'`);
         break;
       default:
@@ -304,67 +331,73 @@ app.get('/meals', async function(req, res) {
     }
   });
   const q = `SELECT * from pasto WHERE id_google_utente='${userId}' ${filters.join(" ")} order by ora ASC`;
-  console.log("QUERY",q);
+  console.log("QUERY", q);
   sql.query(q, (err, result) => {
     if (err) {
       console.log("error: ", err);
-      res.json({success: false, error: err});
+      res.json({ success: false, error: err });
       return;
     }
 
     console.log("meals: ", result);
-    res.json({success: true, result});
+    res.json({ success: true, result });
     return;
   });
 });
 
-app.get('/meals/:id', async function(req, res) {
+app.get('/meals/:id', async function (req, res) {
   const token = req.headers.authorization;
-  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+  if (!token) {
+    res.json({ success: false, error: 'tokenNotFound' });
+    return;
+  }
 
   let tokenDecoded;
   try {
     tokenDecoded = await verifyTokenCorrectness(token);
-  } catch(err) {
-      res.json(err);
-      return;
+  } catch (err) {
+    res.json(err);
+    return;
   }
-  
+
   const userId = tokenDecoded.uid;
-  const {id} = req.params;
-    sql.query(`SELECT * from pasto where _id='${id}' and id_google_utente='${userId}' LIMIT 1`, (err, result) => {
+  const { id } = req.params;
+  sql.query(`SELECT * from pasto where _id='${id}' and id_google_utente='${userId}' LIMIT 1`, (err, result) => {
     if (err) {
       console.log("error: ", err);
-      res.json({success: false, error: err})
+      res.json({ success: false, error: err })
       return;
     }
 
     if (!result.length) {
       console.log("error: ", err);
-      res.json({success: false, error: "Meal not found"});
+      res.json({ success: false, error: "Meal not found" });
       return;
     }
 
     console.log("mealID: ", result);
-    res.json({success: true, result: result[0]});
+    res.json({ success: true, result: result[0] });
     return;
   });
 });
 
-app.post('/meals', async function(req, res) {
+app.post('/meals', async function (req, res) {
   const token = req.headers.authorization;
-  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+  if (!token) {
+    res.json({ success: false, error: 'tokenNotFound' });
+    return;
+  }
 
   let tokenDecoded;
   try {
     tokenDecoded = await verifyTokenCorrectness(token);
-  } catch(err) {
-      res.json(err);
-      return;
+  } catch (err) {
+    res.json(err);
+    return;
   }
-  
+
   const userId = tokenDecoded.uid;
-  const {id} = req.params;
+  const { id } = req.params;
 
   const newMeal = req.body;
   console.log("newMeal: ", newMeal);
@@ -372,84 +405,92 @@ app.post('/meals', async function(req, res) {
   sql.query("INSERT INTO pasto SET ?", newMeal, (err, result) => {
     if (err) {
       console.log("error: ", err);
-      res.json({success: false, error: err});
+      res.json({ success: false, error: err });
       return;
     }
 
     console.log("meal: ", result);
-    res.json({success: true, result});
+    res.json({ success: true, result });
     return;
   });
 });
 
-app.put('/meals/:id',async function(req, res) {
+app.put('/meals/:id', async function (req, res) {
   const token = req.headers.authorization;
-  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+  if (!token) {
+    res.json({ success: false, error: 'tokenNotFound' });
+    return;
+  }
 
   let tokenDecoded;
   try {
     tokenDecoded = await verifyTokenCorrectness(token);
-  } catch(err) {
-      res.json(err);
-      return;
+  } catch (err) {
+    res.json(err);
+    return;
   }
-  
+
   const userId = tokenDecoded.uid;
-  const {id} = req.params;
+  const { id } = req.params;
 
-    const newMeal = req.body;
+  const newMeal = req.body;
 
-    //this query like some other similar, will avoid access not authorized
-    sql.query(`SELECT * from pasto where _id = ? and id_google_utente = ?`, [newMeal.pasto_dieta_id, userId], (err, result) => {
-        if (err) {
-            console.log("error: ", err);
-            res.json({ success: false, error: err })
-            return;
-        }
+  //this query like some other similar, will avoid access not authorized
+  sql.query(`SELECT * from pasto where _id = ? and id_google_utente = ?`, [newMeal.pasto_dieta_id, userId], (err, result) => {
+    if (err) {
+      console.log("error: ", err);
+      res.json({ success: false, error: err })
+      return;
+    }
 
-        if (result.length == 0)
-            res.json({ success: false, error: "user not authorized" })
-    });
+    if (result.length == 0) {
+      res.json({ success: false, error: "user not authorized" });
+      return;
+    }
+  });
 
-    sql.query("UPDATE pasto SET nome = ?, quantita_croccantini = ?, quantita_umido = ?, note = ?, pasto_dieta_id = ?, data = ?, ora = ? WHERE _id = ? and id_google_utente = ?", [
-        newMeal.nome, newMeal.quantita_croccantini, newMeal.quantita_umido, newMeal.note, newMeal.pasto_dieta_id, newMeal.data, newMeal.ora, id, userId
+  sql.query("UPDATE pasto SET nome = ?, quantita_croccantini = ?, quantita_umido = ?, note = ?, pasto_dieta_id = ?, data = ?, ora = ? WHERE _id = ? and id_google_utente = ?", [
+    newMeal.nome, newMeal.quantita_croccantini, newMeal.quantita_umido, newMeal.note, newMeal.pasto_dieta_id, newMeal.data, newMeal.ora, id, userId
   ], (err, result) => {
     if (err) {
       console.log("error: ", err);
-      res.json({success: false, error: err});
+      res.json({ success: false, error: err });
       return;
     }
 
     console.log("meal: ", result);
-    res.json({success: true, result});
+    res.json({ success: true, result });
     return;
   });
 });
 
-app.delete('/meals/:id', async function(req, res) {
+app.delete('/meals/:id', async function (req, res) {
   const token = req.headers.authorization;
-  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+  if (!token) {
+    res.json({ success: false, error: 'tokenNotFound' });
+    return;
+  }
 
   let tokenDecoded;
   try {
     tokenDecoded = await verifyTokenCorrectness(token);
-  } catch(err) {
-      res.json(err);
-      return;
+  } catch (err) {
+    res.json(err);
+    return;
   }
-  
-  const userId = tokenDecoded.uid;
-  const {id} = req.params;
 
-    sql.query("DELETE FROM pasto WHERE _id = ? and id_google_utente = ?", [id, userId], (err, result) => {
+  const userId = tokenDecoded.uid;
+  const { id } = req.params;
+
+  sql.query("DELETE FROM pasto WHERE _id = ? and id_google_utente = ?", [id, userId], (err, result) => {
     if (err) {
       console.log("error: ", err);
-      res.json({success: false, error: err});
+      res.json({ success: false, error: err });
       return;
     }
 
     console.log("meal: ", result);
-    res.json({success: true, result});
+    res.json({ success: true, result });
     return;
   });
 });
@@ -459,251 +500,275 @@ app.delete('/meals/:id', async function(req, res) {
  * These API will communicate with the diet's tables
  */
 
-app.get('/diets', async function(req, res) {
-    const token = req.headers.authorization;
-    console.log(token);
-    console.log(JSON.stringify(headers));
-  if (!token) res.json({ success: false, error: 'tokenNotFound' });
-
+app.get('/diets', async function (req, res) {
+  const token = req.headers.authorization;
+  if (!token) {
+    res.json({ success: false, error: 'tokenNotFound' });
+    return;
+  }
   let tokenDecoded;
   try {
     tokenDecoded = await verifyTokenCorrectness(token);
-  } catch(err) {
-      res.json(err);
-      return;
+  } catch (err) {
+    res.json(err);
+    return;
   }
-  
+
   const userId = tokenDecoded.uid;
   sql.query(`SELECT * from dieta where id_google_utente='${userId}'`, (err, result) => {
     if (err) {
       console.log("error: ", err);
-      res.json({success: false, error: err});
+      res.json({ success: false, error: err });
       return;
     }
 
     console.log("diets: ", result);
-    res.json({success: true, result});
+    res.json({ success: true, result });
     return;
   });
 });
 
-app.get('/diets/:id', async function(req, res) {
+app.get('/diets/:id', async function (req, res) {
   const token = req.headers.authorization;
-  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+  if (!token) {
+    res.json({ success: false, error: 'tokenNotFound' });
+    return;
+  }
 
   let tokenDecoded;
   try {
     tokenDecoded = await verifyTokenCorrectness(token);
-  } catch(err) {
-      res.json(err);
-      return;
+  } catch (err) {
+    res.json(err);
+    return;
   }
-  
+
   const userId = tokenDecoded.uid;
-  const {id} = req.params;
-    sql.query(`SELECT * from dieta where _id='${id}' and id_google_utente='${userId}' LIMIT 1`, (err, result) => {
+  const { id } = req.params;
+  sql.query(`SELECT * from dieta where _id='${id}' and id_google_utente='${userId}' LIMIT 1`, (err, result) => {
     if (err) {
       console.log("error: ", err);
-      res.json({success: false, error: err})
+      res.json({ success: false, error: err })
       return;
     }
 
     if (!result.length) {
       console.log("error: ", err);
-      res.json({success: false, error: "Diet not found"});
+      res.json({ success: false, error: "Diet not found" });
       return;
     }
 
     console.log("dietID: ", result);
-    res.json({success: true, result: result[0]});
+    res.json({ success: true, result: result[0] });
 
     return;
   });
 });
 
-app.get('/diets/last', async function(req, res) {
+app.get('/diets/last', async function (req, res) {
   const token = req.headers.authorization;
-  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+  if (!token) {
+    res.json({ success: false, error: 'tokenNotFound' });
+    return;
+  }
 
   let tokenDecoded;
   try {
     tokenDecoded = await verifyTokenCorrectness(token);
-  } catch(err) {
-      res.json(err);
-      return;
+  } catch (err) {
+    res.json(err);
+    return;
   }
 
-    const userId = tokenDecoded.uid;
+  const userId = tokenDecoded.uid;
 
   sql.query(`SELECT * from dieta where id_google_utente='${userId}' ORDER BY _id DESC LIMIT 1`, (err, result) => {
     if (err) {
       console.log("error: ", err);
-      res.json({success: false, error: err})
+      res.json({ success: false, error: err })
       return;
     }
 
     if (!result.length) {
       console.log("error: ", err);
-      res.json({success: false, error: "Diet not found"});
+      res.json({ success: false, error: "Diet not found" });
       return;
     }
 
     console.log("dietID: ", result);
-    res.json({success: true, result: result[0]});
+    res.json({ success: true, result: result[0] });
 
     return;
   });
 });
 
-app.post('/diets', async function(req, res) {
+app.post('/diets', async function (req, res) {
   const token = req.headers.authorization;
-  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+  if (!token) {
+    res.json({ success: false, error: 'tokenNotFound' });
+    return;
+  }
 
   let tokenDecoded;
   try {
     tokenDecoded = await verifyTokenCorrectness(token);
-  } catch(err) {
-      res.json(err);
-      return;
+  } catch (err) {
+    res.json(err);
+    return;
   }
-  
-  const userId = tokenDecoded.uid;
-  const {id} = req.params;
-  
-  const newDiet = req.body;
-    sql.query(`SELECT * from animale where _id = ? and id_google_utente = ?`, [newDiet.dieta_animale_id, userId], (err, result) => {
-        if (err) {
-            console.log("error: ", err);
-            res.json({ success: false, error: err })
-            return;
-        }
 
-        if (result.length == 0)
-            res.json({ success:false,error:"user not authorized" })
-    });
+  const userId = tokenDecoded.uid;
+  const { id } = req.params;
+
+  const newDiet = req.body;
+  sql.query(`SELECT * from animale where _id = ? and id_google_utente = ?`, [newDiet.dieta_animale_id, userId], (err, result) => {
+    if (err) {
+      console.log("error: ", err);
+      res.json({ success: false, error: err })
+      return;
+    }
+
+    if (result.length == 0) {
+      res.json({ success: false, error: "user not authorized" });
+      return;
+    }
+  });
 
 
 
   sql.query("INSERT INTO dieta SET ?", newDiet, (err, result) => {
     if (err) {
       console.log("error: ", err);
-      res.json({success: false, error: err});
+      res.json({ success: false, error: err });
       return;
     }
 
     console.log("dietPost: ", result);
-    res.json({success: true, result});
+    res.json({ success: true, result });
     return;
   });
 });
 
-app.put('/diets/:id', async function(req, res) {
+app.put('/diets/:id', async function (req, res) {
   const token = req.headers.authorization;
-  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+  if (!token) {
+    res.json({ success: false, error: 'tokenNotFound' });
+    return;
+  }
 
   let tokenDecoded;
   try {
     tokenDecoded = await verifyTokenCorrectness(token);
-  } catch(err) {
-      res.json(err);
-      return;
+  } catch (err) {
+    res.json(err);
+    return;
   }
-  
+
   const userId = tokenDecoded.uid;
-  const {id} = req.params;
+  const { id } = req.params;
 
-    const newDiet = req.body;
+  const newDiet = req.body;
 
-    sql.query(`SELECT * from animale where _id = ? and id_google_utente = ?`, [newDiet.dieta_animale_id, userId], (err, result) => {
-        if (err) {
-            console.log("error: ", err);
-            res.json({ success: false, error: err })
-            return;
-        }
+  sql.query(`SELECT * from animale where _id = ? and id_google_utente = ?`, [newDiet.dieta_animale_id, userId], (err, result) => {
+    if (err) {
+      console.log("error: ", err);
+      res.json({ success: false, error: err })
+      return;
+    }
 
-        if (result.length == 0)
-            res.json({ success: false, error: "user not authorized" })
-    });
+    if (result.length == 0){
+      res.json({ success: false, error: "user not authorized" });
+      return;
+    }
+  });
 
-    sql.query("UPDATE dieta SET nome_dieta = ?, note = ?, dieta_attiva = ?, dieta_animale_id = ?, dieta_dispenser_id = ? WHERE _id = ? and id_google_utente = ?", [
-        newDiet.nome_dieta, newDiet.note, newDiet.dieta_attiva, newDiet.dieta_animale_id, newDiet.dieta_dispenser_id, id, userId
+  sql.query("UPDATE dieta SET nome_dieta = ?, note = ?, dieta_attiva = ?, dieta_animale_id = ?, dieta_dispenser_id = ? WHERE _id = ? and id_google_utente = ?", [
+    newDiet.nome_dieta, newDiet.note, newDiet.dieta_attiva, newDiet.dieta_animale_id, newDiet.dieta_dispenser_id, id, userId
   ], (err, result) => {
     if (err) {
       console.log("error: ", err);
-      res.json({success: false, error: err});
+      res.json({ success: false, error: err });
       return;
     }
 
     console.log("dietPut: ", result);
-    res.json({success: true, result});
+    res.json({ success: true, result });
     return;
   });
 });
 
-app.delete('/diets/:id', async function(req, res) {
+app.delete('/diets/:id', async function (req, res) {
   const token = req.headers.authorization;
-  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+  if (!token) {
+    res.json({ success: false, error: 'tokenNotFound' });
+    return;
+  }
 
   let tokenDecoded;
   try {
     tokenDecoded = await verifyTokenCorrectness(token);
-  } catch(err) {
-      res.json(err);
-      return;
+  } catch (err) {
+    res.json(err);
+    return;
   }
-  
+
   const userId = tokenDecoded.uid;
-  const {id} = req.params;
+  const { id } = req.params;
 
-    const newAnimal = req.body;
+  const newAnimal = req.body;
 
-    sql.query(`SELECT * from dieta where _id = ? and id_google_utente = ?`, [id, userId], (err, result) => {
-        if (err) {
-            console.log("error: ", err);
-            res.json({ success: false, error: err })
-            return;
-        }
-
-        if (result.length == 0)
-            res.json({ success: false, error: "user not authorized" })
-    });
-
-    sql.query("DELETE FROM dieta WHERE _id = ? and id_google_utente = ?", [id, userId], (err, result) => {
+  sql.query(`SELECT * from dieta where _id = ? and id_google_utente = ?`, [id, userId], (err, result) => {
     if (err) {
       console.log("error: ", err);
-      res.json({success: false, error: err});
+      res.json({ success: false, error: err })
+      return;
+    }
+
+    if (result.length == 0) {
+      res.json({ success: false, error: "user not authorized" });
+      return;
+    }
+  });
+
+  sql.query("DELETE FROM dieta WHERE _id = ? and id_google_utente = ?", [id, userId], (err, result) => {
+    if (err) {
+      console.log("error: ", err);
+      res.json({ success: false, error: err });
       return;
     }
 
     console.log("meal: ", result);
-    res.json({success: true, result});
+    res.json({ success: true, result });
     return;
   });
 });
 
-app.get('/diets/:id/meal', async function(req, res) {
+app.get('/diets/:id/meal', async function (req, res) {
   const token = req.headers.authorization;
-  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+  if (!token) {
+    res.json({ success: false, error: 'tokenNotFound' });
+    return;
+  }
 
   let tokenDecoded;
   try {
     tokenDecoded = await verifyTokenCorrectness(token);
-  } catch(err) {
-      res.json(err);
-      return;
+  } catch (err) {
+    res.json(err);
+    return;
   }
-  
+
   const userId = tokenDecoded.uid;
-  const {id} = req.params;
-    sql.query(`select * from pasto where pasto_dieta_id='${id}' and id_google_utente='${userId}'`, (err, result) => {
+  const { id } = req.params;
+  sql.query(`select * from pasto where pasto_dieta_id='${id}' and id_google_utente='${userId}'`, (err, result) => {
     if (err) {
       console.log("error: ", err);
-      res.json({success: false, error: err})
+      res.json({ success: false, error: err })
       return;
     }
 
     console.log("users: ", result);
-    res.json({success: true, result});
+    res.json({ success: true, result });
     return;
   });
 });
@@ -713,25 +778,28 @@ app.get('/diets/:id/meal', async function(req, res) {
  * These API will communicate with the dispenser's tables
  */
 
-app.get('/dispenser', async function(req, res) {
- const token = req.headers.authorization;
-  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+app.get('/dispenser', async function (req, res) {
+  const token = req.headers.authorization;
+  if (!token) {
+    res.json({ success: false, error: 'tokenNotFound' });
+    return;
+  }
 
   let tokenDecoded;
   try {
     tokenDecoded = await verifyTokenCorrectness(token);
-  } catch(err) {
-      res.json(err);
-      return;
+  } catch (err) {
+    res.json(err);
+    return;
   }
-  
+
   const userId = tokenDecoded.uid;
   const filters = [];
 
   Object.keys(req.query).forEach((key) => {
     switch (key) {
       case 'name':
-        if(req.query[key])
+        if (req.query[key])
           filters.push(`AND nome = '${req.query[key]}'`);
         break;
       default:
@@ -743,223 +811,237 @@ app.get('/dispenser', async function(req, res) {
   sql.query(query, (err, result) => {
     if (err) {
       console.log("error: ", err);
-      res.json({success: false, error: err});
+      res.json({ success: false, error: err });
       return;
     }
 
     console.log("dispensers: ", result);
-    res.json({success: true, result});
+    res.json({ success: true, result });
     return;
   });
 });
 
-app.get('/dispenser/:id', async function(req, res) {
+app.get('/dispenser/:id', async function (req, res) {
   const token = req.headers.authorization;
-  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+  if (!token) {
+    res.json({ success: false, error: 'tokenNotFound' });
+    return;
+  }
 
   let tokenDecoded;
   try {
     tokenDecoded = await verifyTokenCorrectness(token);
-  } catch(err) {
-      res.json(err);
-      return;
+  } catch (err) {
+    res.json(err);
+    return;
   }
-  
+
   const userId = tokenDecoded.uid;
-  const {id} = req.params;
-    sql.query(`SELECT * from dispenser where _id='${id}' and id_google_utente='${userId}'`, (err, result) => {
+  const { id } = req.params;
+  sql.query(`SELECT * from dispenser where _id='${id}' and id_google_utente='${userId}'`, (err, result) => {
     if (err) {
       console.log("error: ", err);
-      res.json({success: false, error: err})
+      res.json({ success: false, error: err })
       return;
     }
 
     console.log("dispenserID: ", result);
-    res.json({success: true, result});
+    res.json({ success: true, result });
     return;
   });
 });
 
-app.post('/dispenser', async function(req, res) {
+app.post('/dispenser', async function (req, res) {
   // check if token is valid
   const userId = "uje3LNinlBQRKKnT55Do95tDdPp1";
-  const {id} = req.params;
+  const { id } = req.params;
 
   const newDispenser = req.body;
 
   sql.query("INSERT INTO dispenser SET ?", newDispenser, (err, result) => {
     if (err) {
       console.log("error: ", err);
-      res.json({success: false, error: err});
+      res.json({ success: false, error: err });
       return;
     }
 
     console.log("dispenser: ", result);
-    res.json({success: true, result});
+    res.json({ success: true, result });
     return;
   });
 });
 
-app.put('/dispenser/:id', async function(req, res) {
+app.put('/dispenser/:id', async function (req, res) {
   const token = req.headers.authorization;
-  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+  if (!token) {
+    res.json({ success: false, error: 'tokenNotFound' });
+    return;
+  }
 
   let tokenDecoded;
   try {
     tokenDecoded = await verifyTokenCorrectness(token);
-  } catch(err) {
-      res.json(err);
-      return;
+  } catch (err) {
+    res.json(err);
+    return;
   }
-  
+
   const userId = tokenDecoded.uid;
-  const {id} = req.params;
+  const { id } = req.params;
 
-    const newDispenser = req.body;
+  const newDispenser = req.body;
 
-    sql.query(`SELECT * from dispenser where where _id = ? and id_google_utente = ?`, [id, userId], (err, result) => {
-        if (err) {
-            console.log("error: ", err);
-            res.json({ success: false, error: err })
-            return;
-        }
+  sql.query(`SELECT * from dispenser where where _id = ? and id_google_utente = ?`, [id, userId], (err, result) => {
+    if (err) {
+      console.log("error: ", err);
+      res.json({ success: false, error: err })
+      return;
+    }
 
-        if (result.length == 0)
-            res.json({ success: false, error: "user not authorized" })
-    });
+    if (result.length == 0) {
+      res.json({ success: false, error: "user not authorized" });
+      return;
+    }
+  });
 
-    sql.query("UPDATE dispenser SET nome = ?, codice_bluetooth = ? WHERE _id = ? and and id_google_utente = ?", [
-        newDispenser.nome, newDispenser.codice_bluetooth, id, userId
+  sql.query("UPDATE dispenser SET nome = ?, codice_bluetooth = ? WHERE _id = ? and and id_google_utente = ?", [
+    newDispenser.nome, newDispenser.codice_bluetooth, id, userId
   ], (err, result) => {
     if (err) {
       console.log("error: ", err);
-      res.json({success: false, error: err});
+      res.json({ success: false, error: err });
       return;
     }
 
     console.log("diet: ", result);
-    res.json({success: true, result});
+    res.json({ success: true, result });
     return;
   });
 });
 
-app.delete('/dispenser/:id', async function(req, res) {
+app.delete('/dispenser/:id', async function (req, res) {
   const token = req.headers.authorization;
-  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+  if (!token) {
+    res.json({ success: false, error: 'tokenNotFound' });
+    return;
+  }
 
   let tokenDecoded;
   try {
     tokenDecoded = await verifyTokenCorrectness(token);
-  } catch(err) {
-      res.json(err);
-      return;
+  } catch (err) {
+    res.json(err);
+    return;
   }
-  
+
   const userId = tokenDecoded.uid;
-  const {id} = req.params;
+  const { id } = req.params;
 
-    const newAnimal = req.body;
-
-    sql.query(`SELECT * from dispenser where where _id = ? and id_google_utente = ?`, [id, userId], (err, result) => {
-        if (err) {
-            console.log("error: ", err);
-            res.json({ success: false, error: err })
-            return;
-        }
-
-        if (result.length == 0)
-            res.json({ success: false, error: "user not authorized" })
-    });
-
-    sql.query("DELETE FROM dispenser WHERE _id = ? and and id_google_utente = ?", id, (err, result) => {
+  sql.query(`SELECT * from dispenser where where _id = ? and id_google_utente = ?`, [id, userId], (err, result) => {
     if (err) {
       console.log("error: ", err);
-      res.json({success: false, error: err});
+      res.json({ success: false, error: err })
+      return;
+    }
+
+    if (result.length == 0) {
+      res.json({ success: false, error: "user not authorized" });
+      return;
+    }
+  });
+
+  sql.query("DELETE FROM dispenser WHERE _id = ? and and id_google_utente = ?", id, (err, result) => {
+    if (err) {
+      console.log("error: ", err);
+      res.json({ success: false, error: err });
       return;
     }
 
     console.log("dispenser: ", result);
-    res.json({success: true, result});
+    res.json({ success: true, result });
     return;
   });
 });
 
-app.get('/dispenser/:id/diet', async function(req, res) {
+app.get('/dispenser/:id/diet', async function (req, res) {
   const token = req.headers.authorization;
-  if (!token) res.json({ success: false, error: 'tokenNotFound' });
+  if (!token) {
+    res.json({ success: false, error: 'tokenNotFound' });
+    return;
+  }
 
   let tokenDecoded;
   try {
     tokenDecoded = await verifyTokenCorrectness(token);
-  } catch(err) {
-      res.json(err);
-      return;
+  } catch (err) {
+    res.json(err);
+    return;
   }
-  
+
   const userId = tokenDecoded.uid;
-  const {id} = req.params;
-    sql.query(`select * from dieta where dieta_dispenser_id='${id}' and id_google_utente='${userId}' LIMIT 1`, (err, result) => {
+  const { id } = req.params;
+  sql.query(`select * from dieta where dieta_dispenser_id='${id}' and id_google_utente='${userId}' LIMIT 1`, (err, result) => {
     if (err) {
       console.log("error: ", err);
-      res.json({success: false, error: err})
+      res.json({ success: false, error: err })
       return;
     }
 
     console.log("users: ", result);
-    res.json({success: true, result});
+    res.json({ success: true, result });
     return;
   });
 });
 
-app.get('/item/*', async function(req, res) {
+app.get('/item/*', async function (req, res) {
   // Add your code here
-  res.json({success: 'get call succeed!', url: req.url});
+  res.json({ success: 'get call succeed!', url: req.url });
 });
 
 /****************************
 * Example post method *
 ****************************/
 
-app.post('/item', function(req, res) {
+app.post('/item', function (req, res) {
   // Add your code here
-  res.json({success: 'post call succeed!', url: req.url, body: req.body})
+  res.json({ success: 'post call succeed!', url: req.url, body: req.body })
 });
 
-app.post('/item/*', function(req, res) {
+app.post('/item/*', function (req, res) {
   // Add your code here
-  res.json({success: 'post call succeed!', url: req.url, body: req.body})
+  res.json({ success: 'post call succeed!', url: req.url, body: req.body })
 });
 
 /****************************
 * Example put method *
 ****************************/
 
-app.put('/item', function(req, res) {
+app.put('/item', function (req, res) {
   // Add your code here
-  res.json({success: 'put call succeed!', url: req.url, body: req.body})
+  res.json({ success: 'put call succeed!', url: req.url, body: req.body })
 });
 
-app.put('/item/*', function(req, res) {
+app.put('/item/*', function (req, res) {
   // Add your code here
-  res.json({success: 'put call succeed!', url: req.url, body: req.body})
+  res.json({ success: 'put call succeed!', url: req.url, body: req.body })
 });
 
 /****************************
 * Example delete method *
 ****************************/
 
-app.delete('/item', function(req, res) {
+app.delete('/item', function (req, res) {
   // Add your code here
-  res.json({success: 'delete call succeed!', url: req.url});
+  res.json({ success: 'delete call succeed!', url: req.url });
 });
 
-app.delete('/item/*', function(req, res) {
+app.delete('/item/*', function (req, res) {
   // Add your code here
-  res.json({success: 'delete call succeed!', url: req.url});
+  res.json({ success: 'delete call succeed!', url: req.url });
 });
 
-app.listen(3000, function() {
-    console.log("App started")
+app.listen(3000, function () {
+  console.log("App started")
 });
 
 // Export the app object. When executing the application local this does nothing. However,
