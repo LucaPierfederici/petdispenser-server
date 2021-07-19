@@ -460,7 +460,9 @@ app.delete('/meals/:id', async function(req, res) {
  */
 
 app.get('/diets', async function(req, res) {
-  const token = req.headers.authorization;
+    const token = req.headers.authorization;
+    console.log(token);
+    console.log(JSON.stringify(headers));
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
 
   let tokenDecoded;
