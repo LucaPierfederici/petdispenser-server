@@ -62,6 +62,11 @@ app.get('/checktoken', async function(req, res) {
 
 });
 
+
+//animals
+/*
+ * These api will communicate with the animal's table
+ */
 app.get('/animals', async function (req, res) {
   const token = req.headers.authorization;
   if (!token) res.json({ success: false, error: 'tokenNotFound' });
@@ -182,16 +187,7 @@ app.put('/animals/:id', async function(req, res) {
 
     const newAnimal = req.body;
 
-    sql.query(`SELECT * from animale  where _id = ? and id_google_utente = ?`, [id, userId], (err, result) => {
-        if (err) {
-            console.log("error: ", err);
-            res.json({ success: false, error: err })
-            return;
-        }
-
-        if (result.length == 0)
-            res.json({ success: false, error: "user not authorized" })
-    });
+    
 
     sql.query("UPDATE animale SET nome_animale = ?, path = ?, tipologia = ?, razza = ?, peso = ?, ddn = ? WHERE _id = ? and id_google_utente= ?", [
         newAnimal.nome_animale, newAnimal.path, newAnimal.tipologia, newAnimal.razza, newAnimal.peso, newAnimal.ddn, id, userId
@@ -276,6 +272,11 @@ app.get('/animals/:id/diets', async function(req, res) {
     return;
   });
 });
+
+//meals
+/*
+ * These api will communicate with the meals's table
+ */
 
 app.get('/meals', async function(req, res) {
   const token = req.headers.authorization;
@@ -398,7 +399,8 @@ app.put('/meals/:id',async function(req, res) {
 
     const newMeal = req.body;
 
-    sql.query(`SELECT * from pasto where _id = ? and id_google_utente = ?`, [id, userId], (err, result) => {
+    //this query like some other similar, will avoid access not authorized
+    sql.query(`SELECT * from pasto where _id = ? and id_google_utente = ?`, [newMeal.pasto_dieta_id, userId], (err, result) => {
         if (err) {
             console.log("error: ", err);
             res.json({ success: false, error: err })
@@ -453,6 +455,9 @@ app.delete('/meals/:id', async function(req, res) {
 });
 
 // *** DIET ******
+/*
+ * These API will communicate with the diet's tables
+ */
 
 app.get('/diets', async function(req, res) {
   const token = req.headers.authorization;
@@ -702,6 +707,9 @@ app.get('/diets/:id/meal', async function(req, res) {
 });
 
 //++++++++++++ DISPENSER +++++++++++++++
+/*
+ * These API will communicate with the dispenser's tables
+ */
 
 app.get('/dispenser', async function(req, res) {
  const token = req.headers.authorization;
